@@ -18,6 +18,15 @@
 
 <div class="container" id="dashboard">	
 	<div class="row">		
+		<div class="col-12 text-center">
+			<img src="<?php echo base_url()?>/assets/image/brand.png" alt="brand luh-pernak-pernik" class="brand">
+		</div>
+		<div class="col-12">			
+			<ol class="breadcrumb">
+			  <li class="breadcrumb-item"><a href="<?php echo site_url()?>">Luh pernak-pernik</a></li>			  
+			  <li class="breadcrumb-item active">Inventory</li>
+			</ol>
+		</div>
 		<div class="col" id="headbar">			
 			<div class="input-group mb-2 mb-sm-0 navigation-lpp" id="navigation-lpp">
 				<div class="dropdown show">
@@ -56,7 +65,8 @@
 			processing: true,
 			serverSide: true,
 			language:{
-				search: ""
+				search: "",
+				show: "tampilkan"
 			},
 			ajax: {
 				url: "<?php echo site_url()?>/home/getInventory",

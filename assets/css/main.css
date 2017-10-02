@@ -2,6 +2,11 @@
 	margin: 15px 0;
 }
 
+.brand{
+	height: 150px;
+	width: 150px;
+}
+
 .navigation-lpp .dropdown .dropdown-toggle{
 	border-top-right-radius: 0 !important;
 	border-bottom-right-radius: 0 !important;	
