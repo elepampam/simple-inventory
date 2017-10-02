@@ -1,0 +1,12 @@
+#headbar{
+	margin: 15px 0;
+}
+
+.navigation-lpp .dropdown .dropdown-toggle{
+	border-top-right-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;	
+}
+
+.navigation-lpp .dropdown .dropdown-toggle:after{
+	content: none !important;
+}
