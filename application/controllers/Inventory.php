@@ -1,10 +1,10 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Home extends CI_Controller {
+class Inventory extends CI_Controller {
 	public function index()
 	{
-		$this->load->view('Home-view');
+		$this->load->view('Inventory-view');
 	}
 
 	private function toRP($angka){
@@ -61,9 +61,9 @@ class Home extends CI_Controller {
 				$temp["KODE_BARANG"] = $item->KODE_BARANG;
 				$temp["JENIS_BARANG"] = $item->JENIS_BARANG;
 				$temp["NAMA_BARANG"] = $item->NAMA_BARANG;
-				$temp["HARGA_POKOK"] = $item->HARGA_POKOK;
-				$temp["JUMLAH"] = $item->JUMLAH;
-				$temp["HARGA_TOTAL"] = ($item->HARGA_POKOK * $item->JUMLAH);
+				$temp["HARGA_POKOK"] = $this->toRP($item->HARGA_POKOK);
+				$temp["JUMLAH"] = $item->JUMLAH." lembar";
+				$temp["HARGA_TOTAL"] = $this->toRP($item->HARGA_POKOK * $item->JUMLAH);
 				array_push($data, $temp);
 			}
 		}

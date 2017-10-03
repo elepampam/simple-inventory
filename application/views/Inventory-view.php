@@ -4,7 +4,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>home</title>
+	<title>Inventory</title>
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url()?>assets/vendor/bootstrap/css/bootstrap.css">
 	<script src="<?php echo base_url()?>assets/vendor/jquery/jquery-3.2.1.min.js"></script>
 	<script src="<?php echo base_url()?>assets/vendor/popper/popper.js"></script>
@@ -34,18 +34,18 @@
 				    <span class="oi oi-menu" title="icon menu" aria-hidden="true"></span>
 				  </a>
 				  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-				    <a class="dropdown-item" href="#">Inventory</a>
-				    <a class="dropdown-item" href="#">Pembelian</a>
-				    <a class="dropdown-item" href="#">Pengeluaran</a>
+				    <a class="dropdown-item" href="<?php echo site_url()?>/Inventory">Inventory</a>
+				    <a class="dropdown-item" href="<?php echo site_url()?>/Transaksi/Pembelian">Pembelian</a>
+				    <a class="dropdown-item" href="<?php echo site_url()?>/Transaksi/Pengeluaran">Pengeluaran</a>
 				  </div>
-				</div>		       
-		       <!-- <input type="text" class="form-control" id="inlineFormInputGroupUsername" placeholder="Username"> -->
+				</div>		       		       
 	        </div>
 		</div>
+		<div class="col-12" id="temp-table-head"></div>
 		<div class=" col-12 table-responsive" style="position: relative">
 			<table id="table-inventory" class="table table-stripped table-bordered"></table>	
         </div>		
-		<div class="temp-table-foot"></div>
+		<div class="col-12" id="temp-table-foot"></div>
 	</div>
 </div>
 
@@ -54,11 +54,16 @@
 <script type="text/javascript">
 	$(document).ready(() =>{
 		let redrawTableComponent = () =>{
+			//moving search
 			$("#navigation-lpp").append($("#table-inventory_filter"))			
 			$("#navigation-lpp").append($("#navigation-lpp").find("input"))			
 			$("#navigation-lpp").find("input").addClass("form-control")
 			$("#navigation-lpp").find("input").attr("placeholder","search")
-			// $("#table-inventory_filter").html('<input type="search" class="form-control" placeholder="search" aria-controls="table-inventory">')
+
+			//moving other component
+			$("#temp-table-foot").append($("#table-inventory_info"))
+			$("#temp-table-foot").append($("#table-inventory_paginate"))
+			$("#temp-table-head").append($("#table-inventory_length"))
 		}
 
 		let dataTable = $("#table-inventory").DataTable({
@@ -69,7 +74,7 @@
 				show: "tampilkan"
 			},
 			ajax: {
-				url: "<?php echo site_url()?>/home/getInventory",
+				url: "<?php echo site_url()?>/inventory/getInventory",
 				type: "POST",
 				dataType: "json"
 			},
