@@ -119,3 +119,15 @@
 #tambah-item{
     cursor: pointer;
 }
+
+.delete-item{
+    position: absolute;
+    right: 0;
+    top: -10px;
+    cursor: pointer;
+}
+
+.item-section{
+    display: flex;
+    align-items: center;
+}

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>Pengeluaran</title>
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url()?>assets/vendor/bootstrap/css/bootstrap.css">
-	<script src="<?php echo base_url()?>assets/vendor/jquery/jquery-3.2.1.min.js"></script>
+	<script src="<?php echo base_url()?>assets/vendor/jquery/jquery-3.2.1.min.js"></script>	
 	<script type="text/javascript" src="<?php echo base_url()?>assets/vendor/jquery-ui/jquery-ui.js"></script>
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url()?>/assets/vendor/jquery-ui/jquery-ui.css">
 	<script src="<?php echo base_url()?>assets/vendor/popper/popper.js"></script>
@@ -16,9 +16,6 @@
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url()?>/assets/vendor/open-iconic/font/css/open-iconic-bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo base_url()?>assets/css/main.css">
 </head>
-<style type="text/css">
-	.ui-autocomplete { position: absolute; cursor: default;z-index:30 !important;} 
-</style>
 <body>
 
 <div class="container" id="dashboard">	
@@ -73,16 +70,20 @@
 	      		<button class="btn btn-primary" id="tambah-item">tambah item</button>
 	      	</div>
 	        <div class="col-12" id="form-nota">
+	        	<h3>Item Terpakai: </h3>
 	        	<div id="component-item-1">
-	        		<label for="item1">Item 1</label>
+	        		<div class="col-md-12 col-sm-12 item-section">
+	        			<label for="item1">Item 1</label>
+	        			<button class="btn btn-danger delete-item" data-component="component-item-1">x</button>
+	        		</div>	        		
 	        		<div class="row">
-	        			<div class="col-4 form-group">
+	        			<div class="col-md-4 col-sm-12 form-group">
 		        			<input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-1">
 		        		</div>		        	
-			        	<div class="col-4 form-group">
+			        	<div class="col-md-4 col-sm-12 form-group">
 			        		<input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-1">
 			        	</div>
-			        	<div class="col-4 form-group">
+			        	<div class="col-md-4 col-sm-12 form-group">
 			        		<input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-1">
 			        	</div>					        		        
 	        		</div>
@@ -102,7 +103,6 @@
 	  </div>
 	</div>
 </div>
-
 </body>
 
 <script type="text/javascript">
@@ -166,6 +166,7 @@
 		})
 
 		let openModalNota = () => {
+			$("body").css("overflow", "hidden");
 			$("#modalNota").modal({backdrop: "static"})
 		}
 
@@ -176,7 +177,7 @@
 		let numberItem = 1
 		let tambahItem = () => {
 			numberItem = numberItem+1
-			let componentItem = `<div id="component-item-${numberItem}"><label for="item${numberItem}">Item ${numberItem}</label><div class="row"><div class="col-4 form-group"><input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-${numberItem}"></div><div class="col-4 form-group"><input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-${numberItem}"></div><div class="col-4 form-group"><input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-${numberItem}"></div></div></div>`
+			let componentItem = `<div id="component-item-${numberItem}"><div class="col-sm-12 col-md-12" style="margin-bottom:12px"><button class="btn btn-danger delete-item" data-component="component-item-1">x</button><label for="item${numberItem}">Item ${numberItem}</label></div><div class="row"><div class="col-md-4 col-sm-12 form-group"><input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-${numberItem}"></div><div class="col-md-4 col-sm-12 form-group"><input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-${numberItem}"></div><div class="col-md-4 col-sm-12 form-group"><input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-${numberItem}"></div></div></div>`
 			$("#form-nota").append(componentItem)
 		}
 
