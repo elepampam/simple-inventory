@@ -14,19 +14,32 @@ class Transaksi extends CI_Controller {
 		$this->load->model("InventoryModel", "inventorymodel");
 		$key = $this->input->get('key');
 		$result = $this->inventorymodel->GetKodeBarang($key);
-		$kodeBarang = array();
-		$kodeBarang['kode'] = array();
-		$kodeBarang['nama'] = array();
+		$kodeBarang = array();	
 		if (!empty($result)) {
-			foreach ($result as $kode) {
-				array_push($kodeBarang['kode'], $kode->KODE_BARANG);
-				$kodeBarang['nama'][$kode->KODE_BARANG] = $kode->NAMA_BARANG;
-				// array_push($kodeBarang['nama'], array($kode->KODE_BARANG => $kode->NAMA_BARANG));
+			foreach ($result as $kode) {				
+				array_push($kodeBarang, $kode->KODE_BARANG);
 			}
 		}				
 		else
-			array_push($kodeBarang['kode'], 'kode barang not found');		
+			array_push($kodeBarang, 'kode barang not found');		
 		echo json_encode($kodeBarang);
+	}
+
+	public function GetNamaBarang(){
+		$this->load->model("InventoryModel", "inventorymodel");
+		$key = $this->input->get('key');
+		$result = $this->inventorymodel->GetNamaBarang($key);		
+		if (!empty($result)) {
+			$response = array(
+				"nama" => $result->NAMA_BARANG
+			);
+		}				
+		else{
+			$response = array(
+				"nama" => "nama barang tidak ditemukan"
+			);
+		}		
+		echo json_encode($response);
 	}
 
 	public function CheckAvailableItem(){

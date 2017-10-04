@@ -51,12 +51,24 @@ class InventoryModel extends CI_Model {
 	}
 
 	public function GetKodeBarang($key){
-		$this->db->select("KODE_BARANG, NAMA_BARANG");
+		$this->db->select("KODE_BARANG");
 		$this->db->from('inventory');
 		$this->db->like('KODE_BARANG',$key);
 		$result = $this->db->get();
 		if ($result->num_rows() > 0) {
 			return $result->result();
+		}
+		else
+			return null;
+	}
+
+	public function GetNamaBarang($key){
+		$this->db->select("NAMA_BARANG");
+		$this->db->from('inventory');
+		$this->db->like('KODE_BARANG',$key);
+		$result = $this->db->get();
+		if ($result->num_rows() > 0) {
+			return $result->row();
 		}
 		else
 			return null;

@@ -74,7 +74,7 @@
 	        	<div id="component-item-1">
 	        		<div class="col-md-12 col-sm-12 item-section">
 	        			<label for="item1">Item 1</label>
-	        			<button class="btn btn-danger delete-item" data-component="component-item-1">x</button>
+	        			<button class="btn btn-danger delete-item" data-component="1">x</button>
 	        		</div>	        		
 	        		<div class="row">
 	        			<div class="col-md-4 col-sm-12 form-group">
@@ -177,7 +177,7 @@
 		let numberItem = 1
 		let tambahItem = () => {
 			numberItem = numberItem+1
-			let componentItem = `<div id="component-item-${numberItem}"><div class="col-sm-12 col-md-12" style="margin-bottom:12px"><button class="btn btn-danger delete-item" data-component="component-item-1">x</button><label for="item${numberItem}">Item ${numberItem}</label></div><div class="row"><div class="col-md-4 col-sm-12 form-group"><input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-${numberItem}"></div><div class="col-md-4 col-sm-12 form-group"><input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-${numberItem}"></div><div class="col-md-4 col-sm-12 form-group"><input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-${numberItem}"></div></div></div>`
+			let componentItem = `<div id="component-item-${numberItem}"><div class="col-sm-12 col-md-12"><button class="btn btn-danger delete-item" data-component="${numberItem}">x</button><label for="item${numberItem}">Item ${numberItem}</label></div><div class="row"><div class="col-md-4 col-sm-12 form-group"><input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-${numberItem}"></div><div class="col-md-4 col-sm-12 form-group"><input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-${numberItem}"></div><div class="col-md-4 col-sm-12 form-group"><input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-${numberItem}"></div></div></div>`
 			$("#form-nota").append(componentItem)
 		}
 
@@ -187,7 +187,7 @@
 
 		$("#form-nota").on("keyup",'.kode-barang', (e) => {												
 			let id = $(e.target).attr("id")
-			let data = {}
+			let data = []
 			let dataKode
 			$(`#${id}`).autocomplete({
 				source: (req,res) => {
@@ -197,24 +197,30 @@
 						ContentType: 'application/json',
 		                dataType: 'json',                     
 		                success: (result, status) => {                	
-		                	data = result
-		                	dataKode = result.kode
-		                	res(result.kode)
+		                	data = result		                	
+		                	res(result)
 		                }
 					})
 				},
 				appendTo: $(e.target).parent(),
-				select: (event, ui) => {										
-					let idNama = `nama-barang-${id.split("-").pop()}`
-					$(`#${idNama}`).val(data.nama[ui.item.value])
+				select: (event, ui) => {							
+					$.ajax({
+						url: "<?php echo site_url()?>/Transaksi/GetNamaBarang?key="+ui.item.value,
+						type: "GET",
+						ContentType: 'application/json',
+		                dataType: 'json',                     
+		                success: (result, status) => {                	
+		                	let idNama = `nama-barang-${id.split("-").pop()}`
+							$(`#${idNama}`).val(result.nama)
+		                }
+					})
 				}
 			})
 		})
 
-		let checkKodeBarang = (kodeBarang, componentNoId) => {					
-			let component = `component-item-${componentNoId}`;
-			console.log(kodeBarang)
-			console.log(component)
+		let checkKodeBarang = (kodeBarang, componentNoId) => {		
+		console.log(stackItem[kodeBarang])			
+			let component = `component-item-${componentNoId}`;						
 			$.ajax({
 				url: "<?php echo site_url()?>/Transaksi/CheckAvailableItem?kode-barang="+kodeBarang,
 				type: "GET",
@@ -227,18 +233,49 @@
                 		let alertKetersediaan = '<div class="alert alert-danger" role="alert" style="margin: 5px 0;">Barang tidak tersedia pada inventory atau stock kosong! Silahkan pilih barang lainnya</div>'
                 		$(`#${component}`).append(alertKetersediaan)
                 	}
+                	else{
+                		if (stackItem[kodeBarang] != undefined) {
+                			if ($(`#jumlah-barang-${componentNoId}`).val() != "") {
+                				let tempJumlah = $(`#jumlah-barang-${componentNoId}`).val()
+                				stackItem[kodeBarang] = parseInt(stackItem[kodeBarang]) + parseInt(tempJumlah)
+                			} 
+                			else {
+                				stackItem[kodeBarang] = parseInt(stackItem[kodeBarang]) + 0
+                			}                			
+                		} 
+                		else {
+                			stackItem[kodeBarang] = 0
+                			if ($(`#jumlah-barang-${componentNoId}`).val() != "") {
+                				let tempJumlah = $(`#jumlah-barang-${componentNoId}`).val()
+                				stackItem[kodeBarang] = parseInt(stackItem[kodeBarang]) + parseInt(tempJumlah)
+                			}              			
+                		}
+                	}
+                	console.log(stackItem)
                 }
 			})
 		}
 
-		$("#form-nota").on("focusout",'.kode-barang', (e) => {
+		$("#form-nota").on("change",'.kode-barang', (e) => {
+			console.log("asd")
 			let noId = $(e.target).attr('id').split("-").pop()
 			checkKodeBarang($(e.target).val(), noId)
 		})
 
-		$("#form-nota").on("focusout",'.jumlah-barang', (e) => {
+		$("#form-nota").on("change",'.jumlah-barang', (e) => {			
+			console.log("123123")
 			let noId = $(e.target).attr('id').split("-").pop()
-			checkJumlahBarang($(e.target).val(), noId)
+			let kodeBarang = $(`#kode-barang-${noId}`).val()
+			if (stackItem[kodeBarang] != undefined) {
+				stackItem[kodeBarang] = parseInt(stackItem[kodeBarang]) + parseInt($(e.target).val()) 
+			}			
+			else if(kodeBarang != ""){
+				stackItem[kodeBarang] = $(e.target).val()
+			}
+			console.log(stackItem)
+			if (kodeBarang != "") {
+				checkJumlahBarang(stackItem[kodeBarang], noId)
+			}			
 		})
 
 		let checkJumlahBarang = (jumlah, componentNoId) => {					
@@ -250,7 +287,7 @@
 				ContentType: 'application/json',
                 dataType: 'json',                     
                 success: (result, status) => {     
-                	console.log(result)         
+                	// console.log(result)         
                 	$(`#${component}`).find('.alert').remove()  	
                 	if (!result.available) {                		
                 		let alertKetersediaan = '<div class="alert alert-danger" role="alert" style="margin: 5px 0;">Stock barang pada inventory tidak mencukupi atau kosong</div>'
@@ -258,6 +295,22 @@
                 	}
                 }
 			})
+		}
+
+		$("#form-nota").on("click", ".delete-item", (e) => {
+			let noId = $(e.target).data("component")
+			if (noId > 1) {
+				hapusItem(noId)
+			}			
+		})
+
+		let hapusItem = (noId) =>{
+			let kodeBarang = $(`#kode-barang-${noId}`).val()
+			let jumlahBarang = $(`#jumlah-barang-${noId}`).val()
+			console.log(noId)
+			// if (stackItem.kodeBarang != undefined) {
+			// 	stackItem.kodeBarang 
+			// }
 		}
 	})
 </script>
