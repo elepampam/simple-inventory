@@ -62,4 +62,28 @@ class InventoryModel extends CI_Model {
 			return null;
 	}
 
+	public function checkItem($kodeBarang){
+		$this->db->select("*");
+		$this->db->from("inventory");
+		$this->db->where("KODE_BARANG", $kodeBarang);
+		$result = $this->db->get();
+		if ($result->num_rows() > 0) {
+			return true;
+		}
+		else
+			return false;
+	}
+
+	public function getJumlahItem($kodeBarang){
+		$this->db->select("JUMLAH");
+		$this->db->from("inventory");
+		$this->db->where("KODE_BARANG", $kodeBarang);
+		$result = $this->db->get();
+		if ($result->num_rows() > 0) {
+			return $result->row();
+		}
+		else
+			return null;	
+	}
+
 }

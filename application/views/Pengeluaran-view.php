@@ -59,40 +59,44 @@
 	  <div class="modal-dialog modal-lg" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	        <h5 class="modal-title" id="exampleModalLabel">Pengeluaran</h5>
+	        <h5 class="modal-title" id="exampleModalLabel">Nota Pengeluaran</h5>
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 	          <span aria-hidden="true">&times;</span>
 	        </button>
 	      </div>
 	      <div class="modal-body">
 	      	<div class="col-12" style="text-align:right;">
+	      		<div class="form-group">
+	      			<p for="pelanggan" style="text-align:left">Pelanggan :</p>
+        			<input type="text" name="nama-pelanggan" class="form-control nama-pelanggan" placeholder="Nama Pelanggan" id="nama-pelanggan">
+        		</div>
 	      		<button class="btn btn-primary" id="tambah-item">tambah item</button>
 	      	</div>
 	        <div class="col-12" id="form-nota">
-	        	<div class="form-group" id="component-item-1">
+	        	<div id="component-item-1">
 	        		<label for="item1">Item 1</label>
 	        		<div class="row">
-	        			<div class="col-4">
+	        			<div class="col-4 form-group">
 		        			<input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-1">
-		        			<div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-								<a class="dropdown-item" href="<?php echo site_url()?>/Inventory">Inventory</a>
-								<a class="dropdown-item" href="<?php echo site_url()?>/Transaksi/Pembelian">Pembelian</a>
-								<a class="dropdown-item" href="<?php echo site_url()?>/Transaksi/Pengeluaran">Pengeluaran</a>
-							</div>
 		        		</div>		        	
-			        	<div class="col-4">
+			        	<div class="col-4 form-group">
 			        		<input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-1">
 			        	</div>
-			        	<div class="col-4">
-			        		<input type="number" name="jumlah-barang" class="form-control" placeholder="jumlah barang" id="jumlah-barang-1">
-			        	</div>			        	
+			        	<div class="col-4 form-group">
+			        		<input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-1">
+			        	</div>					        		        
 	        		</div>
 		        </div>
 	        </div>
+	        <hr>
+        	<div class="col-12 form-group">
+        		<label for="deskripsi">Deskripsi :</label>
+        		<textarea class="form-control" placeholder="deksripsi" id="deskripsi-nota"></textarea>
+        	</div>	
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	        <button type="button" class="btn btn-primary">Save changes</button>
+	        <button type="button" class="btn btn-primary" id="simpan">Simpan</button>
 	      </div>
 	    </div>
 	  </div>
@@ -168,53 +172,17 @@
 		$("#btn-nota").on('click', () => {
 			openModalNota()
 		})
-		let numberItem = 1;
+		let stackItem = {}
+		let numberItem = 1
 		let tambahItem = () => {
 			numberItem = numberItem+1
-			let componentItem = `<div class="form-group" id="component-item-${numberItem}"><label for="item${numberItem}">Item ${numberItem}</label><div class="row"><div class="col-4"><input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-${numberItem}"></div><div class="col-4"><input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-${numberItem}"></div><div class="col-4"><input type="number" name="jumlah-barang" class="form-control" placeholder="jumlah barang" id="jumlah-barang-${numberItem}"></div></div></div>`
+			let componentItem = `<div id="component-item-${numberItem}"><label for="item${numberItem}">Item ${numberItem}</label><div class="row"><div class="col-4 form-group"><input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-${numberItem}"></div><div class="col-4 form-group"><input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-${numberItem}"></div><div class="col-4 form-group"><input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-${numberItem}"></div></div></div>`
 			$("#form-nota").append(componentItem)
 		}
 
 		$("#tambah-item").on("click", () => {
 			tambahItem()
-		})
-
-		let autoCompleteKodeBarang = (req, res) => {
-			$.ajax({
-				url: "<?php echo site_url()?>/Transaksi/GetKodeBarang",
-				type: "GET",
-				ContentType: 'application/json',
-                dataType: 'json',                     
-                success: (result, status) => {                	
-                	res(result)
-                }
-			})
-		}		
-
-		var availableTags = [
-	      "ActionScript",
-	      "AppleScript",
-	      "Asp",
-	      "BASIC",
-	      "C",
-	      "C++",
-	      "Clojure",
-	      "COBOL",
-	      "ColdFusion",
-	      "Erlang",
-	      "Fortran",
-	      "Groovy",
-	      "Haskell",
-	      "Java",
-	      "JavaScript",
-	      "Lisp",
-	      "Perl",
-	      "PHP",
-	      "Python",
-	      "Ruby",
-	      "Scala",
-	      "Scheme"
-	    ];		
+		})	
 
 		$("#form-nota").on("keyup",'.kode-barang', (e) => {												
 			let id = $(e.target).attr("id")
@@ -235,12 +203,61 @@
 					})
 				},
 				appendTo: $(e.target).parent(),
-				select: (event, ui) => {					
+				select: (event, ui) => {										
 					let idNama = `nama-barang-${id.split("-").pop()}`
 					$(`#${idNama}`).val(data.nama[ui.item.value])
 				}
 			})
 		})
+
+		let checkKodeBarang = (kodeBarang, componentNoId) => {					
+			let component = `component-item-${componentNoId}`;
+			console.log(kodeBarang)
+			console.log(component)
+			$.ajax({
+				url: "<?php echo site_url()?>/Transaksi/CheckAvailableItem?kode-barang="+kodeBarang,
+				type: "GET",
+				ContentType: 'application/json',
+                dataType: 'json',                     
+                success: (result, status) => {     
+                	console.log(result)         
+                	$(`#${component}`).find('.alert').remove()  	
+                	if (!result.available) {                		
+                		let alertKetersediaan = '<div class="alert alert-danger" role="alert" style="margin: 5px 0;">Barang tidak tersedia pada inventory atau stock kosong! Silahkan pilih barang lainnya</div>'
+                		$(`#${component}`).append(alertKetersediaan)
+                	}
+                }
+			})
+		}
+
+		$("#form-nota").on("focusout",'.kode-barang', (e) => {
+			let noId = $(e.target).attr('id').split("-").pop()
+			checkKodeBarang($(e.target).val(), noId)
+		})
+
+		$("#form-nota").on("focusout",'.jumlah-barang', (e) => {
+			let noId = $(e.target).attr('id').split("-").pop()
+			checkJumlahBarang($(e.target).val(), noId)
+		})
+
+		let checkJumlahBarang = (jumlah, componentNoId) => {					
+			let component = `component-item-${componentNoId}`
+			let kodeBarang = $(`#kode-barang-${componentNoId}`).val()
+			$.ajax({
+				url: "<?php echo site_url()?>/Transaksi/CheckJumlahItem?kode-barang="+kodeBarang+"&jumlah="+jumlah,
+				type: "GET",
+				ContentType: 'application/json',
+                dataType: 'json',                     
+                success: (result, status) => {     
+                	console.log(result)         
+                	$(`#${component}`).find('.alert').remove()  	
+                	if (!result.available) {                		
+                		let alertKetersediaan = '<div class="alert alert-danger" role="alert" style="margin: 5px 0;">Stock barang pada inventory tidak mencukupi atau kosong</div>'
+                		$(`#${component}`).append(alertKetersediaan)
+                	}
+                }
+			})
+		}
 	})
 </script>
 </html>

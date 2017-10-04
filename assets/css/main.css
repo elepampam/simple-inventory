@@ -115,3 +115,7 @@
     float: right;
     cursor: pointer;
 }
+
+#tambah-item{
+    cursor: pointer;
+}
