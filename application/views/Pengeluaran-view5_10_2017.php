@@ -173,7 +173,8 @@
 		$("#btn-nota").on('click', () => {
 			openModalNota()
 		})
-	
+
+		let stackItem = {}
 		let notaItem = []
 		let numberItem = 1
 		let indexItem = 0
@@ -233,7 +234,8 @@
 				type: "GET",
 				ContentType: 'application/json',
                 dataType: 'json',                     
-                success: (result, status) => {                     	        
+                success: (result, status) => {     
+                	console.log(result)         
                 	$(`#${component}`).find('.alert').remove()  	
                 	if (!result.available) {                		
                 		let alertKetersediaan = '<div class="alert alert-danger" role="alert" style="margin: 5px 0;">Barang tidak tersedia pada inventory atau stock kosong! Silahkan pilih barang lainnya</div>'
@@ -245,8 +247,29 @@
                 			namaBarang: $(`#nama-barang-${componentNoId}`).val(),
                 			jumlah: $(`#jumlah-barang-${componentNoId}`).val()
                 		}                		
-                		console.log(notaItem)                		
-                	}                	
+                		console.log(notaItem)
+                		if (stackItem[kodeBarang] != undefined) {
+                			if ($(`#jumlah-barang-${componentNoId}`).val() != "") {
+                				tempJumlah = $(`#jumlah-barang-${componentNoId}`).val()
+                				stackItem[kodeBarang] = parseInt(stackItem[kodeBarang]) + parseInt(tempJumlah)
+                			} 
+                			else {
+                				if (notaItem[index].jumlah != 0) {
+                					stackItem[kodeBarang] = parseInt(stackItem[kodeBarang]) + 0
+                				} else {
+                					stackItem[kodeBarang] = 0
+                				}                				
+                			}                			
+                		} 
+                		else {
+                			stackItem[kodeBarang] = 0
+                			if ($(`#jumlah-barang-${componentNoId}`).val() != "") {
+                				tempJumlah = $(`#jumlah-barang-${componentNoId}`).val()
+                				stackItem[kodeBarang] = parseInt(stackItem[kodeBarang]) + parseInt(tempJumlah)
+                			}              			
+                		}
+                	}
+                	console.log(stackItem)
                 }
 			})
 		}
@@ -258,7 +281,18 @@
 
 		$("#form-nota").on("change",'.jumlah-barang', (e) => {						
 			let noId = $(e.target).attr('id').split("-").pop()
-			let kodeBarang = $(`#kode-barang-${noId}`).val()					
+			let kodeBarang = $(`#kode-barang-${noId}`).val()			
+			if (stackItem[kodeBarang] != undefined) {
+				let bantu = parseInt($(e.target).val()) - notaItem[$(e.target).data("index")].jumlah				
+				stackItem[kodeBarang] = parseInt(stackItem[kodeBarang]) + bantu				
+			}			
+			else if(kodeBarang != ""){
+				stackItem[kodeBarang] = $(e.target).val()
+			}
+			console.log(stackItem)
+			if (kodeBarang != "") {
+				checkJumlahBarang(stackItem[kodeBarang], noId, $(e.target).data("index"))
+			}			
 		})
 
 		let checkJumlahBarang = (jumlah, componentNoId, index) => {					
