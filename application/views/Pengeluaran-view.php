@@ -84,7 +84,7 @@
 			        		<input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-1" data-index="0">
 			        	</div>
 			        	<div class="col-md-4 col-sm-12 form-group">
-			        		<input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-1" data-index="0">
+			        		<input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-1" data-index="0" value="0">
 			        	</div>					        		        
 	        		</div>
 		        </div>
@@ -204,7 +204,7 @@
 				namaBarang: "",
 				jumlah:0
 			}
-			let componentItem = `<div id="component-item-${numberItem}"><div class="col-sm-12 col-md-12"><button class="btn btn-danger delete-item" data-component="${numberItem}">x</button><label for="item${numberItem}">Item ${numberItem}</label></div><div class="row"><div class="col-md-4 col-sm-12 form-group"><input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-${numberItem}" data-index=${indexItem}></div><div class="col-md-4 col-sm-12 form-group"><input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-${numberItem}" data-index=${indexItem}></div><div class="col-md-4 col-sm-12 form-group"><input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-${numberItem}" data-index=${indexItem}></div></div></div>`
+			let componentItem = `<div id="component-item-${numberItem}"><div class="col-sm-12 col-md-12"><button class="btn btn-danger delete-item" data-component="${numberItem}">x</button><label for="item${numberItem}">Item ${numberItem}</label></div><div class="row"><div class="col-md-4 col-sm-12 form-group"><input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-${numberItem}" data-index=${indexItem}></div><div class="col-md-4 col-sm-12 form-group"><input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-${numberItem}" data-index=${indexItem}></div><div class="col-md-4 col-sm-12 form-group"><input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-${numberItem}" data-index=${indexItem} value="0"></div></div></div>`
 			$("#form-nota").append(componentItem)
 		}
 
@@ -276,36 +276,68 @@
 
 		$("#form-nota").on("change",'.jumlah-barang', (e) => {						
 			let noId = $(e.target).attr('id').split("-").pop()
-			let kodeBarang = $(`#kode-barang-${noId}`).val()					
-			checkJumlahBarang(0, noId, $(e.target).data("index"))
+			let kodeBarang = $(`#kode-barang-${noId}`).val()								
+			checkJumlahBarang(kodeBarang, noId, $(e.target).data("index"))
 		})
 
-		let checkJumlahBarang = (jumlah, componentNoId, index) => {					
-			let component = `component-item-${componentNoId}`
-			let kodeBarang = $(`#kode-barang-${componentNoId}`).val()
-			$.ajax({
-				url: "<?php echo site_url()?>/Transaksi/CheckJumlahItem?kode-barang="+kodeBarang+"&jumlah="+jumlah,
-				type: "GET",
-				ContentType: 'application/json',
-                dataType: 'json',                     
-                success: (result, status) => {     
-                	// console.log(result)         
-                	$(`#${component}`).find('.alert').remove()  	
-                	if (!result.available) {                		
-                		let alertKetersediaan = '<div class="alert alert-danger" role="alert" style="margin: 5px 0;">Stock barang pada inventory tidak mencukupi atau kosong</div>'
-                		$(`#${component}`).append(alertKetersediaan)
-                	}
-                	else{
-                		notaItem[index] = {
-                			kodeBarang: $(`#kode-barang-${componentNoId}`).val(),
-                			namaBarang: $(`#nama-barang-${componentNoId}`).val(),
-                			jumlah: $(`#jumlah-barang-${componentNoId}`).val()
-                		}     
-                		console.log(notaItem)
-                	}
-                }
-			})
+		let checkJumlahBarang = (kodeBarang, noId, index) => {
+			let component = `component-item-${noId}`
+			console.log(component)
+			$(`#${component}`).remove(".alert-ketersediaan")
+			if (notaItem[index] != undefined) {
+				let oldJumlah = parseInt(notaItem[index].jumlah)
+				let newJumlah = 0
+				if ($(`#jumlah-barang-${noId}`).val() != "") {
+					newJumlah = parseInt($(`#jumlah-barang-${noId}`).val())
+				}
+				notaItem[index].jumlah = newJumlah
+				let changeCount = newJumlah - oldJumlah
+				console.log("old: "+oldJumlah)
+				console.log("new: "+newJumlah)
+				console.log("perubahan:" +changeCount)
+				let storage = parseInt(localStorage.getItem(kodeBarang))				
+				if ((storage - changeCount) < 0) {					
+					$(`#jumlah-barang-${noId}`).val(0)
+					notaItem[index].jumlah = 0															
+					storage = storage + oldJumlah
+					localStorage.setItem(kodeBarang,storage)
+					let alertKetersediaan = '<div class="alert alert-danger alert-ketersediaan" role="alert" style="margin: 5px 0;">Stock barang pada inventory tidak mencukupi, stock tersisa: '+localStorage.getItem([kodeBarang])+'</div>'
+            		$(`#${component}`).append(alertKetersediaan)
+
+				} else {
+					storage = storage - changeCount
+					localStorage.setItem(kodeBarang,storage)
+				}
+				console.log(localStorage)
+			}			
 		}
+		// let checkJumlahBarang = (jumlah, componentNoId, index) => {					
+		// 	let component = `component-item-${componentNoId}`
+		// 	let kodeBarang = $(`#kode-barang-${componentNoId}`).val()
+
+		// 	$.ajax({
+		// 		url: "<?php echo site_url()?>/Transaksi/CheckJumlahItem?kode-barang="+kodeBarang+"&jumlah="+jumlah,
+		// 		type: "GET",
+		// 		ContentType: 'application/json',
+  //               dataType: 'json',                     
+  //               success: (result, status) => {     
+  //               	// console.log(result)         
+  //               	$(`#${component}`).find('.alert').remove()  	
+  //               	if (!result.available) {                		
+  //               		let alertKetersediaan = '<div class="alert alert-danger" role="alert" style="margin: 5px 0;">Stock barang pada inventory tidak mencukupi atau kosong</div>'
+  //               		$(`#${component}`).append(alertKetersediaan)
+  //               	}
+  //               	else{
+  //               		notaItem[index] = {
+  //               			kodeBarang: $(`#kode-barang-${componentNoId}`).val(),
+  //               			namaBarang: $(`#nama-barang-${componentNoId}`).val(),
+  //               			jumlah: $(`#jumlah-barang-${componentNoId}`).val()
+  //               		}     
+  //               		console.log(notaItem)
+  //               	}
+  //               }
+		// 	})
+		// }
 
 		$("#form-nota").on("click", ".delete-item", (e) => {
 			let noId = $(e.target).data("component")
