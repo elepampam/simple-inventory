@@ -109,4 +109,29 @@ class InventoryModel extends CI_Model {
 			return null;		
 	}
 
+	public function getAllInventoryArray($items){
+		$this->db->select("*");
+		$this->db->from('inventory');
+		$this->db->where_in("KODE_BARANG", $items);
+		$result = $this->db->get();
+		if ($result->num_rows() > 0) {
+			return $result->result_array();
+		}
+		else
+			return null;
+	}
+
+	public function updateInventory($query){		
+		$result = $this->db->query($query);
+		return $result;
+	}
+
+	public function insertBukuPengeluaran($nota){
+		$this->db->insert('buku_pengeluaran', $nota);
+	}
+
+	public function insertPengeluaran($item){
+		$this->db->insert_batch('pengeluaran', $item);
+	}
+
 }

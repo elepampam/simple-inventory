@@ -62,43 +62,46 @@
 	        </button>
 	      </div>
 	      <div class="modal-body">
-	      	<div class="col-12" style="text-align:right;">
-	      		<div class="form-group">
-	      			<p for="pelanggan" style="text-align:left">Pelanggan :</p>
-        			<input type="text" name="nama-pelanggan" class="form-control nama-pelanggan" placeholder="Nama Pelanggan" id="nama-pelanggan">
-        		</div>
-	      		<button class="btn btn-primary" id="tambah-item">tambah item</button>
-	      	</div>
-	        <div class="col-12" id="form-nota">
-	        	<h3>Item Terpakai: </h3>
-	        	<div id="component-item-1">
-	        		<div class="col-md-12 col-sm-12 item-section">
-	        			<label for="item1">Item 1</label>
-	        			<button class="btn btn-danger delete-item" data-component="1">x</button>
-	        		</div>	        		
-	        		<div class="row">
-	        			<div class="col-md-4 col-sm-12 form-group">
-		        			<input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-1" data-index="0">
-		        		</div>		        	
-			        	<div class="col-md-4 col-sm-12 form-group">
-			        		<input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-1" data-index="0">
-			        	</div>
-			        	<div class="col-md-4 col-sm-12 form-group">
-			        		<input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-1" data-index="0" value="0">
-			        	</div>					        		        
+		    <form action="<?php echo site_url()?>/Transaksi/SimpanNotaPenjualan" method="POST">		      		    
+		      	<div class="col-12" style="text-align:right;">
+		      		<div class="form-group">
+		      			<p for="pelanggan" style="text-align:left">Pelanggan :</p>
+	        			<input type="text" name="nama-pelanggan" class="form-control nama-pelanggan" placeholder="Nama Pelanggan" id="nama-pelanggan">
 	        		</div>
+		      		<button type="button" class="btn btn-primary" id="tambah-item">tambah item</button>		      		
+		      	</div>
+		        <div class="col-12" id="form-nota">
+		        	<h3>Item Terpakai: </h3>
+		        	<div id="component-item-1" data-index="0">
+		        		<div class="col-md-12 col-sm-12 item-section">
+		        			<label for="item1">Item 1</label>
+		        			<!-- <button class="btn btn-danger delete-item" data-component="1">x</button> -->
+		        		</div>	        		
+		        		<div class="row">
+		        			<div class="col-md-4 col-sm-12 form-group">
+			        			<input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-1" data-index="0">
+			        		</div>		        	
+				        	<div class="col-md-4 col-sm-12 form-group">
+				        		<input type="text" name="nama-barang[]" class="form-control" placeholder="nama barang" id="nama-barang-1" data-index="0">
+				        	</div>
+				        	<div class="col-md-4 col-sm-12 form-group">
+				        		<input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-1" data-index="0" value="0">
+				        	</div>					        		        
+		        		</div>
+			        </div>
 		        </div>
-	        </div>
-	        <hr>
-        	<div class="col-12 form-group">
-        		<label for="deskripsi">Deskripsi :</label>
-        		<textarea class="form-control" placeholder="deksripsi" id="deskripsi-nota"></textarea>
-        	</div>	
+		        <hr>
+	        	<div class="col-12 form-group">
+	        		<label for="deskripsi">Deskripsi :</label>
+	        		<textarea class="form-control" placeholder="deksripsi" id="deskripsi-nota" name="deskripsi"></textarea>
+	        	</div>		        
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	        <button type="button" class="btn btn-primary" id="simpan">Simpan</button>
+	        <!-- <button type="button" class="btn btn-primary" id="simpan">Simpan</button> -->
+	        <input type="submit" name="simpan" class="btn btn-primary" value="submit">
 	      </div>
+	      	</form>
 	    </div>
 	  </div>
 	</div>
@@ -204,7 +207,7 @@
 				namaBarang: "",
 				jumlah:0
 			}
-			let componentItem = `<div id="component-item-${numberItem}"><div class="col-sm-12 col-md-12"><button class="btn btn-danger delete-item" data-component="${numberItem}">x</button><label for="item${numberItem}">Item ${numberItem}</label></div><div class="row"><div class="col-md-4 col-sm-12 form-group"><input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-${numberItem}" data-index=${indexItem}></div><div class="col-md-4 col-sm-12 form-group"><input type="text" name="nama-barang" class="form-control" placeholder="nama barang" id="nama-barang-${numberItem}" data-index=${indexItem}></div><div class="col-md-4 col-sm-12 form-group"><input type="number" name="jumlah-barang" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-${numberItem}" data-index=${indexItem} value="0"></div></div></div>`
+			let componentItem = `<div id="component-item-${numberItem}" data-index=${indexItem}><div class="col-sm-12 col-md-12"><button class="btn btn-danger delete-item" data-component="${numberItem}">x</button><label for="item${numberItem}">Item ${numberItem}</label></div><div class="row"><div class="col-md-4 col-sm-12 form-group"><input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-${numberItem}" data-index=${indexItem}></div><div class="col-md-4 col-sm-12 form-group"><input type="text" name="nama-barang[]" class="form-control" placeholder="nama barang" id="nama-barang-${numberItem}" data-index=${indexItem}></div><div class="col-md-4 col-sm-12 form-group"><input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-${numberItem}" data-index=${indexItem} value="0"></div></div></div>`
 			$("#form-nota").append(componentItem)
 		}
 
@@ -281,9 +284,8 @@
 		})
 
 		let checkJumlahBarang = (kodeBarang, noId, index) => {
-			let component = `component-item-${noId}`
-			console.log(component)
-			$(`#${component}`).remove(".alert-ketersediaan")
+			let component = `component-item-${noId}`			
+			$(`#${component}`).find(".alert-ketersediaan").remove()
 			if (notaItem[index] != undefined) {
 				let oldJumlah = parseInt(notaItem[index].jumlah)
 				let newJumlah = 0
@@ -292,9 +294,9 @@
 				}
 				notaItem[index].jumlah = newJumlah
 				let changeCount = newJumlah - oldJumlah
-				console.log("old: "+oldJumlah)
-				console.log("new: "+newJumlah)
-				console.log("perubahan:" +changeCount)
+				// console.log("old: "+oldJumlah)
+				// console.log("new: "+newJumlah)
+				// console.log("perubahan:" +changeCount)
 				let storage = parseInt(localStorage.getItem(kodeBarang))				
 				if ((storage - changeCount) < 0) {					
 					$(`#jumlah-barang-${noId}`).val(0)
@@ -304,53 +306,49 @@
 					let alertKetersediaan = '<div class="alert alert-danger alert-ketersediaan" role="alert" style="margin: 5px 0;">Stock barang pada inventory tidak mencukupi, stock tersisa: '+localStorage.getItem([kodeBarang])+'</div>'
             		$(`#${component}`).append(alertKetersediaan)
 
-				} else {
+				} else{					
 					storage = storage - changeCount
 					localStorage.setItem(kodeBarang,storage)
 				}
 				console.log(localStorage)
 			}			
 		}
-		// let checkJumlahBarang = (jumlah, componentNoId, index) => {					
-		// 	let component = `component-item-${componentNoId}`
-		// 	let kodeBarang = $(`#kode-barang-${componentNoId}`).val()
-
-		// 	$.ajax({
-		// 		url: "<?php echo site_url()?>/Transaksi/CheckJumlahItem?kode-barang="+kodeBarang+"&jumlah="+jumlah,
-		// 		type: "GET",
-		// 		ContentType: 'application/json',
-  //               dataType: 'json',                     
-  //               success: (result, status) => {     
-  //               	// console.log(result)         
-  //               	$(`#${component}`).find('.alert').remove()  	
-  //               	if (!result.available) {                		
-  //               		let alertKetersediaan = '<div class="alert alert-danger" role="alert" style="margin: 5px 0;">Stock barang pada inventory tidak mencukupi atau kosong</div>'
-  //               		$(`#${component}`).append(alertKetersediaan)
-  //               	}
-  //               	else{
-  //               		notaItem[index] = {
-  //               			kodeBarang: $(`#kode-barang-${componentNoId}`).val(),
-  //               			namaBarang: $(`#nama-barang-${componentNoId}`).val(),
-  //               			jumlah: $(`#jumlah-barang-${componentNoId}`).val()
-  //               		}     
-  //               		console.log(notaItem)
-  //               	}
-  //               }
-		// 	})
-		// }
 
 		$("#form-nota").on("click", ".delete-item", (e) => {
 			let noId = $(e.target).data("component")
+			let index = $(`#component-item-${noId}`).data('index')
 			if (noId > 1) {
-				hapusItem(noId)
+				hapusItem(noId, index)
 			}			
 		})
 
-		let hapusItem = (noId) =>{
+		let hapusItem = (noId, index) =>{
 			let kodeBarang = $(`#kode-barang-${noId}`).val()
-			let jumlahBarang = $(`#jumlah-barang-${noId}`).val()
-			console.log(noId)			
+			let jumlahBarang = parseInt($(`#jumlah-barang-${noId}`).val())
+			let storage = parseInt(localStorage.getItem(kodeBarang))
+			storage = storage + jumlahBarang
+			localStorage.setItem(kodeBarang, storage)
+			notaItem[index] = {}
+			// console.log(notaItem)
+			// console.log(localStorage)
+			$(`#component-item-${noId}`).remove()
 		}
+
+		$("#form-nota").on('keydown', 'input', (e) => {
+			console.log(e.keyCode)
+			if (e.keyCode == 13) {
+				e.preventDefault()
+				return false
+			}
+		})
+
+		
+		$(window).keydown(function(event){
+			if(event.keyCode == 13) {
+				event.preventDefault();
+				return false;
+			}
+		});		
 	})
 </script>
 </html>
