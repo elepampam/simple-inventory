@@ -107,6 +107,25 @@
 
 <script type="text/javascript">
 	$(document).ready(() =>{
+		// creating local storage
+		if (typeof(Storage) !== undefined) {
+			console.log("ada")
+			$.ajax({
+				url: "<?php echo site_url()?>/Inventory/GetInventoryJSON",
+				type: "GET",
+				ContentType: 'application/json',
+                dataType: 'json',                     
+                success: (result, status) => {
+                	result.map((item,index) => {
+                		localStorage.setItem(item.KODE_BARANG,item.JUMLAH)
+                	})
+                	console.log(localStorage)
+                }
+			})
+		} else {
+			alert("your browser doest support local storage, pls change the browser")
+		}
+
 		let redrawTableComponent = () =>{
 			//moving search
 			$("#navigation-lpp").append($("#table-inventory_filter"))			
@@ -249,16 +268,16 @@
                 	}                	
                 }
 			})
-		}
-
+		}		
 		$("#form-nota").on("change",'.kode-barang', (e) => {			
-			let noId = $(e.target).attr('id').split("-").pop()			
+			let noId = $(e.target).attr('id').split("-").pop()						
 			checkKodeBarang($(e.target).val(), noId, $(e.target).data('index'))
 		})		
 
 		$("#form-nota").on("change",'.jumlah-barang', (e) => {						
 			let noId = $(e.target).attr('id').split("-").pop()
 			let kodeBarang = $(`#kode-barang-${noId}`).val()					
+			checkJumlahBarang(0, noId, $(e.target).data("index"))
 		})
 
 		let checkJumlahBarang = (jumlah, componentNoId, index) => {					

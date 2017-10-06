@@ -98,4 +98,15 @@ class InventoryModel extends CI_Model {
 			return null;	
 	}
 
+	public function getAllInventory(){
+		$this->db->select("*");
+		$this->db->from("inventory");		
+		$result = $this->db->get();
+		if ($result->num_rows() > 0) {
+			return $result->result();
+		}
+		else
+			return null;		
+	}
+
 }

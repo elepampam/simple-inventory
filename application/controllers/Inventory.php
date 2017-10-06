@@ -76,5 +76,17 @@ class Inventory extends CI_Controller {
 		);
 		echo json_encode($jsonData);
 	}
+	public function GetInventoryJSON(){
+		$this->load->model("InventoryModel","inventorymodel");
+		$items = $this->inventorymodel->getAllInventory();
+		$response = array();		
+		foreach ($items as $item) {
+			array_push($response, array(
+				"KODE_BARANG" => $item->KODE_BARANG,
+				"JUMLAH" => $item->JUMLAH
+			));
+		}
+		echo json_encode($response);
+	}
 
 }
