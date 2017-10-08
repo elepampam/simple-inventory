@@ -133,5 +133,4 @@ class InventoryModel extends CI_Model {
 	public function insertPengeluaran($item){
 		$this->db->insert_batch('pengeluaran', $item);
 	}
-
 }

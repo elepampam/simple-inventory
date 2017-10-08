@@ -110,10 +110,12 @@
     100% { transform: rotate(360deg); }
 }
 
+.btn{
+    cursor: pointer;
+}
 /*button nota*/
 .btn-nota{
-    float: right;
-    cursor: pointer;
+    float: right;    
 }
 
 #tambah-item{

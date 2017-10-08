@@ -101,6 +101,10 @@ class Transaksi extends CI_Controller {
 
 	public function SimpanNotaPenjualan(){		
 		$generatedIdNota = uniqid();
+		$this->load->model("TransaksiModel", "transaksimodel");
+		while ($this->transaksimodel->checkGeneratedId("buku_pengeluaran", $generatedIdNota)) {
+			$generatedIdNota = uniqid();
+		}
 		$pelanggan = $this->input->post('nama-pelanggan');
 		$deskripsi = $this->input->post('deskripsi');
 		$kodeBarang = $this->input->post('kode-barang');
@@ -124,20 +128,116 @@ class Transaksi extends CI_Controller {
 			}
 			else{
 				array_push($items["kode"], $kodeBarang[$i]);
-				$items["jumlah"][$kodeBarang[$i]] = $jumlah[$i] * -1;
+				$items["jumlah"][$kodeBarang[$i]] = $jumlah[$i] * -1;				
+			}			
+
+			if (count($pengeluaran) == 0) {
 				array_push($pengeluaran, array(
 					"NO_PENGELUARAN" => $generatedIdNota,
 					"KODE_BARANG" => $kodeBarang[$i],
 					"JUMLAH" => $jumlah[$i]
-				));
-			}
-		}		
-
-		$this->updatePengeluaranInventory($items);
+				));	
+			}		
+			else{
+				$isFound = false;
+				for ($indeksPengeluaran=0; $indeksPengeluaran < count($pengeluaran); $indeksPengeluaran++) { 
+					if ($pengeluaran[$indeksPengeluaran]["KODE_BARANG"] == $kodeBarang[$i]) {
+						$pengeluaran[$indeksPengeluaran]["JUMLAH"] += $jumlah[$i];
+						$isFound = true;
+						break;
+					}
+				}
+				if (!$isFound) {
+					array_push($pengeluaran, array(
+						"NO_PENGELUARAN" => $generatedIdNota,
+						"KODE_BARANG" => $kodeBarang[$i],
+						"JUMLAH" => $jumlah[$i]
+					));
+				}
+			}	
+		}				
 		$this->load->model("inventorymodel", "inventorymodel");
+		$this->updatePengeluaranInventory($items);		
 		$this->inventorymodel->insertBukuPengeluaran($nota);
 		$this->inventorymodel->insertPengeluaran($pengeluaran);
 
 		redirect('Transaksi/Pengeluaran');
+	}
+
+	public function GetBukuPengeluaran(){
+		$this->load->model('TransaksiModel', 'transaksimodel');
+		$columns = array(
+			0 => "NO_BUKU",
+			1 => "TANGGAL_KELUAR",
+			2 => "PELANGGAN",
+			3 => "DESKRIPSI"
+		);
+		
+		$limit = $this->input->post('length');
+		$start = $this->input->post('start');
+		$order = $this->input->post('order')[0]['column'];
+		if ($order < 4) {
+			$order = $columns[$order];
+		}				
+		$dir = $this->input->post('order')[0]['dir'];
+
+		$totalData = $this->transaksimodel->countBukuPengeluaran();
+
+		$totalFiltered = $totalData;
+		if (empty($this->input->post('search')['value'])) {
+				$items = $this->transaksimodel->getBukuPengeluaranData($limit,$start,$order,$dir);
+		}	
+		else{
+			$search = $this->input->post('search')['value'];			
+			$items = $this->transaksimodel->bukuPengeluaranSearch($search,$limit,$start,$order,$dir);
+			$totalFiltered = $this->transaksimodel->bukuPengeluaranSearchCount($search);
+		}
+
+		$data = array();		
+		if (!empty($items)) {
+			foreach ($items as $item) {
+				$temp["NO_BUKU"] = $item->NO_BUKU;
+				$temp["TANGGAL_KELUAR"] = $item->TANGGAL_KELUAR;
+				$temp["PELANGGAN"] = $item->PELANGGAN;
+				$temp["DESKRIPSI"] = $item->DESKRIPSI;	
+				$temp["ACTION"] = 
+				"<button type='button' class='btn btn-primary btn-view' data-nobuku='".$item->NO_BUKU."'><span class='oi oi-eye' title='icon menu' aria-hidden='true'></span></button>
+				<button type='button' class='btn btn-danger' data-no-buku='".$item->NO_BUKU."'><span class='oi oi-trash' title='icon menu' aria-hidden='true'></span></button>";
+				array_push($data, $temp);
+			}
+		}
+
+		$jsonData = array(
+			   "draw"            => intval($this->input->post('draw')),  
+                "recordsTotal"    => intval($totalData),  
+                "recordsFiltered" => intval($totalFiltered), 
+                "data"            => $data   
+		);
+		echo json_encode($jsonData);
+	}
+
+	public function GetDetailPengeluaran(){
+		$noBuku = $this->input->get('no-buku');
+		$this->load->model("TransaksiModel","transaksimodel");
+		$items = $this->transaksimodel->GetDetailPengeluaran($noBuku);					
+		$response = array();
+		if (!empty($items)) {
+			$response["pelanggan"] = $items[0]->PELANGGAN;
+			$response["deskripsi"] = $items[0]->DESKRIPSI;
+			$response["items"] = array();
+			foreach ($items as $item) {
+				$temp["KODE_BARANG"] = $item->KODE_BARANG;
+				$temp["NAMA_BARANG"] = $item->NAMA_BARANG;
+				$temp["JUMLAH"] = $item->JUMLAH;
+				array_push($response["items"], $temp);
+			}
+		}
+		else{
+			$response["pelanggan"] = "tidak ditemukan";
+			$response["deskripsi"] = "tidak ditemukan";
+			$response["items"] = array();
+		}
+
+		echo json_encode($response);
 	}
 }

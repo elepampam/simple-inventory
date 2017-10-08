@@ -47,7 +47,7 @@
 			<button class="btn btn-primary btn-nota" id="btn-nota">Nota Pengeluaran Baru</button>
 		</div>
 		<div class=" col-12 table-responsive" style="position: relative">
-			<table id="table-inventory" class="table table-stripped table-bordered"></table>	
+			<table id="table-pengeluaran" class="table table-stripped table-bordered"></table>	
         </div>		
 		<div class="col-12" id="temp-table-foot"></div>
 	</div>
@@ -105,6 +105,59 @@
 	    </div>
 	  </div>
 	</div>
+
+	<!-- modal view and edit -->		
+	<div class="modal fade" id="modalView" tabindex="-1" role="dialog" aria-labelledby="modalEditView" aria-hidden="true">
+	  <div class="modal-dialog modal-lg" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">Nota <span id="headernota"></span></h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+		    <form action="<?php echo site_url()?>/Transaksi/SimpanNotaPenjualan" method="POST">		      		    
+		      	<div class="col-12" style="text-align:right;">
+		      		<div class="form-group">
+		      			<p for="pelanggan" style="text-align:left">Pelanggan :</p>
+	        			<input type="text" name="nama-pelanggan" class="form-control nama-pelanggan" placeholder="Nama Pelanggan" id="view-pelanggan">
+	        		</div>
+		      		<!-- <button type="button" class="btn btn-primary" id="edit-tambah-item" disabled="true">tambah item</button>		      		 -->
+		      	</div>
+		        <div class="col-12" id="form-view">
+		        	<h3>Item Terpakai: </h3>
+		        <!-- 	<div class="component-view" id="component-view-0" data-index="0">
+		        		<div class="col-md-12 col-sm-12 item-section">
+		        			<label for="item1">Item 1</label>
+		        			<button class="btn btn-danger delete-item" data-component="0">x</button>
+		        		</div>	        		
+		        		<div class="row">
+		        			<div class="col-md-4 col-sm-12 form-group">
+			        			<input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="view-kode-barang-0" data-index="0" disabled="true">
+			        		</div>		        	
+				        	<div class="col-md-4 col-sm-12 form-group">
+				        		<input type="text" name="nama-barang[]" class="form-control" placeholder="nama barang" id="view-nama-barang-0" data-index="0" disabled="true">
+				        	</div>
+				        	<div class="col-md-4 col-sm-12 form-group">
+				        		<input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="view-jumlah-barang-0" data-index="0" value="0" disabled="true">
+				        	</div>					        		        
+		        		</div>
+			        </div> -->
+		        </div>
+		        <hr>
+	        	<div class="col-12 form-group">
+	        		<label for="deskripsi">Deskripsi :</label>
+	        		<textarea class="form-control" placeholder="deksripsi" id="view-deskripsi" name="deskripsi"></textarea>
+	        	</div>		        
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>	        	        
+	      </div>
+	      	</form>
+	    </div>
+	  </div>
+	</div>
 </div>
 </body>
 
@@ -129,21 +182,28 @@
 			alert("your browser doest support local storage, pls change the browser")
 		}
 
+		$('#form-nota').on('focusin', 'input, textarea', function(event) {
+		  if(navigator.userAgent.indexOf('Android') > -1 && navigator.userAgent.indexOf('iPhone')){
+		   var scroll = $(this).offset();
+		   window.scrollTo(0, scroll);
+		 }
+		});
+
 		let redrawTableComponent = () =>{
 			//moving search
-			$("#navigation-lpp").append($("#table-inventory_filter"))			
+			$("#navigation-lpp").append($("#table-pengeluaran_filter"))			
 			$("#navigation-lpp").append($("#navigation-lpp").find("input"))			
 			$("#navigation-lpp").find("input").addClass("form-control")
 			$("#navigation-lpp").find("input").attr("placeholder","search")
 
 			//moving other component
-			$("#temp-table-foot").append($("#table-inventory_info"))
-			$("#temp-table-foot").append($("#table-inventory_paginate"))
-			$("#temp-table-head").append($("#table-inventory_length"))
-			$("#table-inventory_length").css("margin","10px 0")
+			$("#temp-table-foot").append($("#table-pengeluaran_info"))
+			$("#temp-table-foot").append($("#table-pengeluaran_paginate"))
+			$("#temp-table-head").append($("#table-pengeluaran_length"))
+			$("#table-pengeluaran_length").css("margin","10px 0")
 		}
 
-		let dataTable = $("#table-inventory").DataTable({
+		let dataTable = $("#table-pengeluaran").DataTable({
 			processing: true,
 			serverSide: true,
 			language:{
@@ -151,34 +211,29 @@
 				show: "tampilkan"
 			},
 			ajax: {
-				url: "<?php echo site_url()?>/inventory/getInventory",
+				url: "<?php echo site_url()?>/Transaksi/GetBukuPengeluaran",
 				type: "POST",
 				dataType: "json"
 			},
 			columns: [
 				{
-					data: "KODE_BARANG",
-					title: "KODE BARANG"
+					data: "NO_BUKU",
+					title: "NO BUKU"
 				},
 				{
-					data: "JENIS_BARANG",
-					title: "JENIS BARANG"
+					data: "TANGGAL_KELUAR",
+					title: "TANGGAL KELUAR"
 				},
 				{
-					data: "NAMA_BARANG",
-					title: "NAMA BARANG"
+					data: "PELANGGAN",
+					title: "PELANGGAN"
 				},
 				{
-					data: "JUMLAH",
-					title: "JUMLAH"
-				},
-				{
-					data: "HARGA_POKOK",
-					title: "HARGA POKOK"
-				},
-				{
-					data: "HARGA_TOTAL",
-					title: "HARGA TOTAL"
+					data: "DESKRIPSI",
+					title: "DESKRIPSI"
+				},{
+					data: "ACTION",
+					title: "ACTION"
 				}
 			],
 			initComplete: () => {
@@ -349,6 +404,58 @@
 				return false;
 			}
 		});		
+
+		// view edit delete action here
+		$('#table-pengeluaran').on("click",".btn-view",(e) =>{			
+			let noBuku = $(e.currentTarget).data("nobuku")					
+			$.ajax({
+				url: "<?php echo site_url()?>/Transaksi/GetDetailPengeluaran?no-buku="+noBuku,
+				type: "GET",
+				ContentType: 'application/json',
+                dataType: 'json',                     
+                success: (result, status) => { 
+               		let indexView = 0
+               		console.log(result)
+               		$("#form-view").find(".component-view").remove()
+               		$("#headernota").html(noBuku)
+               		$("#view-pelanggan").val(result.pelanggan)
+               		$("#view-deskripsi").val(result.deskripsi)               		
+               		let appendComponent = ""
+               		result.items.map((item) => {               			
+               			let componentView = `
+               			<div class="component-view" id="component-view-0" data-index="0">
+			        		<div class="col-md-12 col-sm-12 item-section">
+			        			<label for="item${indexView}">Item ${indexView+1}</label>		        			
+			        		</div>	        		
+			        		<div class="row">
+			        			<div class="col-md-4 col-sm-12 form-group">
+				        			<input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="view-kode-barang-${indexView}" data-index="0" readonly="true" value="${item.KODE_BARANG}">
+				        		</div>		        	
+					        	<div class="col-md-4 col-sm-12 form-group">
+					        		<input type="text" name="nama-barang[]" class="form-control" placeholder="nama barang" id="view-nama-barang-${indexView}" data-index="0" readonly="true" value="${item.NAMA_BARANG}">
+					        	</div>
+					        	<div class="col-md-4 col-sm-12 form-group">
+					        		<input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="view-jumlah-barang-${indexView}" data-index="0" readonly="true" value="${item.JUMLAH}">
+					        	</div>					        		        
+			        		</div>
+				        </div>`               
+				        indexView++
+               			appendComponent += componentView
+               		})
+               		$("#form-view").append(appendComponent)
+               		$("#modalView").modal()
+						                	
+     //            	console.log(result.pelanggan)
+     //        		console.log(result.deskripsi)            		
+     //            	result.items.map((item, index) => {                		
+     //            		console.log(item.KODE_BARANG)
+     //            		console.log(item.NAMA_BARANG)
+     //            		console.log(item.JUMLAH)
+     //            	})
+                }
+			})
+		})
+
 	})
 </script>
 </html>

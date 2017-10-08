@@ -30,10 +30,6 @@ class Inventory extends CI_Controller {
 			2 => "NAMA_BARANG",
 			3 => "HARGA_POKOK"
 		);
-
-		$months = array(
-			"Januari", "Februari", "Maret", "April", "Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"
-		);
 		
 		$limit = $this->input->post('length');
 		$start = $this->input->post('start');
