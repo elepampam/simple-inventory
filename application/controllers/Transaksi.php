@@ -155,11 +155,10 @@ class Transaksi extends CI_Controller {
 					));
 				}
 			}	
-		}				
-		$this->load->model("inventorymodel", "inventorymodel");
+		}						
 		$this->updatePengeluaranInventory($items);		
-		$this->inventorymodel->insertBukuPengeluaran($nota);
-		$this->inventorymodel->insertPengeluaran($pengeluaran);
+		$this->transaksimodel->insertBukuPengeluaran($nota);
+		$this->transaksimodel->insertPengeluaran($pengeluaran);
 
 		redirect('Transaksi/Pengeluaran');
 	}
@@ -202,7 +201,59 @@ class Transaksi extends CI_Controller {
 				$temp["DESKRIPSI"] = $item->DESKRIPSI;	
 				$temp["ACTION"] = 
 				"<button type='button' class='btn btn-primary btn-view' data-nobuku='".$item->NO_BUKU."'><span class='oi oi-eye' title='icon menu' aria-hidden='true'></span></button>
-				<button type='button' class='btn btn-danger' data-no-buku='".$item->NO_BUKU."'><span class='oi oi-trash' title='icon menu' aria-hidden='true'></span></button>";
+				<a href='".site_url()."/Transaksi/DeletePengeluaran?nobuku=".$item->NO_BUKU."' class='btn btn-danger btn-delete' data-nobuku='".$item->NO_BUKU."'><span class='oi oi-trash' title='icon menu' aria-hidden='true'></span></a>";
+				array_push($data, $temp);
+			}
+		}
+
+		$jsonData = array(
+			   "draw"            => intval($this->input->post('draw')),  
+                "recordsTotal"    => intval($totalData),  
+                "recordsFiltered" => intval($totalFiltered), 
+                "data"            => $data   
+		);
+		echo json_encode($jsonData);
+	}
+
+	public function GetBukuPembelian(){
+		$this->load->model('TransaksiModel', 'transaksimodel');
+		$columns = array(
+			0 => "NO_BUKU",
+			1 => "TANGGAL_BELI",
+			2 => "TOKO_BELI",
+			3 => "DESKRIPSI"
+		);
+		
+		$limit = $this->input->post('length');
+		$start = $this->input->post('start');
+		$order = $this->input->post('order')[0]['column'];
+		if ($order < 4) {
+			$order = $columns[$order];
+		}				
+		$dir = $this->input->post('order')[0]['dir'];
+
+		$totalData = $this->transaksimodel->countBukuPembelian();
+
+		$totalFiltered = $totalData;
+		if (empty($this->input->post('search')['value'])) {
+				$items = $this->transaksimodel->getBukuPembelianData($limit,$start,$order,$dir);
+		}	
+		else{
+			$search = $this->input->post('search')['value'];			
+			$items = $this->transaksimodel->bukuPembelianSearch($search,$limit,$start,$order,$dir);
+			$totalFiltered = $this->transaksimodel->bukuPembelianSearchCount($search);
+		}
+
+		$data = array();		
+		if (!empty($items)) {
+			foreach ($items as $item) {
+				$temp["NO_BUKU"] = $item->NO_BUKU;
+				$temp["TANGGAL_BELI"] = $item->TANGGAL_BELI;
+				$temp["TOKO_BELI"] = $item->TOKO_BELI;
+				$temp["DESKRIPSI"] = $item->DESKRIPSI;	
+				$temp["ACTION"] = 
+				"<button type='button' class='btn btn-primary btn-view' data-nobuku='".$item->NO_BUKU."'><span class='oi oi-eye' title='icon menu' aria-hidden='true'></span></button>
+				<a href='".site_url()."/Transaksi/DeletePengeluaran?nobuku=".$item->NO_BUKU."' class='btn btn-danger btn-delete' data-nobuku='".$item->NO_BUKU."'><span class='oi oi-trash' title='icon menu' aria-hidden='true'></span></a>";
 				array_push($data, $temp);
 			}
 		}
@@ -239,5 +290,89 @@ class Transaksi extends CI_Controller {
 		}
 
 		echo json_encode($response);
+	}
+
+	public function DeletePengeluaran(){
+		$noBuku = $this->input->get("nobuku");
+		$this->load->model("TransaksiModel","transaksimodel");
+		$status1 = $this->transaksimodel->DeleteBukuPengeluaran($noBuku);
+		$status2 = $this->transaksimodel->DeletePengeluaran($noBuku);
+		redirect("Transaksi/Pengeluaran");
+	}	
+
+	private function updatePembelianInventory($items){
+		$query = "REPLACE INTO `inventory` (`KODE_BARANG`,`JENIS_BARANG`,`NAMA_BARANG`,`HARGA_POKOK`,`JUMLAH`) VALUES ";
+		$this->load->model('InventoryModel', 'inventorymodel');		
+		
+		for ($i=0; $i < count($items) ; $i++) { 			
+			$query = $query."('".$items[$i]->KODE_BARANG."', '".$items[$i]->JENIS_BARANG."', '".$items[$i]->NAMA_BARANG."', '".$items[$i]->HARGA_POKOK."', '".$items[$i]->JUMLAH."') ";
+			if (isset($items[$i+1])) {
+				$query .= ", ";
+			}
+		}		
+
+		echo $query;
+		echo "<br>";
+		$updateResult = $this->inventorymodel->updateInventory($query);
+		return $updateResult;		
+	}
+	public function SimpanNotaPembelian(){
+		$generatedIdNota = uniqid();		
+		$this->load->model("TransaksiModel", "transaksimodel");
+		while ($this->transaksimodel->checkGeneratedId("buku_pembelian", $generatedIdNota)) {
+			$generatedIdNota = uniqid();
+		}
+
+		$toko = $this->input->post("nama-toko");
+		$kodeBarang = $this->input->post("kode-barang");
+		$namaBarang = $this->input->post("nama-barang");
+		$jenis = $this->input->post("jenis-barang");
+		$jumlah = $this->input->post("jumlah-barang");
+		$harga = $this->input->post("harga-barang");
+		$deskripsi = $this->input->post("deskripsi");
+		
+		$items = $this->transaksimodel->AmbilInventory($kodeBarang);			
+		$nota = array(
+			"NO_BUKU" => $generatedIdNota,
+			"TANGGAL_BELI" => date("Y-m-d"),
+			"TOKO_BELI" => $toko,
+			"DESKRIPSI" => $deskripsi
+		);
+
+		$pembelian = array();
+		if (!empty($items)) {
+			for ($i=0; $i < count($kodeBarang); $i++) { 
+				$kodeBarang[$i] = strtoupper($kodeBarang[$i]);
+				$found = false;
+				foreach ($items as $item) {
+					if ($kodeBarang[$i] === $item->KODE_BARANG) {
+						$item->HARGA_POKOK = round((($item->JUMLAH * $item->HARGA_POKOK) + ($harga[$i])) / ($item->JUMLAH + $jumlah[$i]));
+						$item->JUMLAH += $jumlah[$i];
+						$found = true;
+						break;
+					}
+				}
+				if (!$found) {
+					array_push($items, (object) array(
+						"KODE_BARANG" => $kodeBarang[$i],
+						"JENIS_BARANG" => $jenis[$i],
+						"NAMA_BARANG" => $namaBarang[$i],
+						"HARGA_POKOK" => $harga[$i],
+						"JUMLAH" => $jumlah[$i]
+					));
+				}
+
+				array_push($pembelian, array(
+					"NO_PEMBELIAN" => $generatedIdNota,
+					"KODE_BARANG" =>$kodeBarang[$i],
+					"JUMLAH" => $jumlah[$i],
+					"HARGA_BELI" => $jumlah[$i]
+				));				
+			}
+		}								
+		$this->updatePembelianInventory($items);						
+		$this->transaksimodel->insertBukuPembelian($nota);
+		$this->transaksimodel->insertPembelian($pembelian);
+		redirect("Transaksi/Pembelian");
 	}
 }

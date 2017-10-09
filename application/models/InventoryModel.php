@@ -125,12 +125,4 @@ class InventoryModel extends CI_Model {
 		$result = $this->db->query($query);
 		return $result;
 	}
-
-	public function insertBukuPengeluaran($nota){
-		$this->db->insert('buku_pengeluaran', $nota);
-	}
-
-	public function insertPengeluaran($item){
-		$this->db->insert_batch('pengeluaran', $item);
-	}
 }

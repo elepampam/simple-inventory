@@ -26,7 +26,7 @@
 		<div class="col-12">			
 			<ol class="breadcrumb">
 			  <li class="breadcrumb-item"><a href="<?php echo site_url()?>">Luh pernak-pernik</a></li>			  
-			  <li class="breadcrumb-item active">Pengeluaran</li>
+			  <li class="breadcrumb-item active">Pembelian</li>
 			</ol>
 		</div>
 		<div class="col" id="headbar">			
@@ -44,7 +44,7 @@
 	        </div>
 		</div>
 		<div class="col-12" id="temp-table-head">
-			<button class="btn btn-primary btn-nota" id="btn-nota">Nota Pengeluaran Baru</button>
+			<button class="btn btn-primary btn-nota" id="btn-nota">Nota Pembelian Baru</button>
 		</div>
 		<div class=" col-12 table-responsive" style="position: relative">
 			<table id="table-pengeluaran" class="table table-stripped table-bordered"></table>	
@@ -56,37 +56,43 @@
 	  <div class="modal-dialog modal-lg" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
-	        <h5 class="modal-title" id="exampleModalLabel">Nota Pengeluaran</h5>
+	        <h5 class="modal-title" id="exampleModalLabel">Nota Pembelian</h5>
 	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 	          <span aria-hidden="true">&times;</span>
 	        </button>
 	      </div>
 	      <div class="modal-body">
-		    <form action="<?php echo site_url()?>/Transaksi/SimpanNotaPenjualan" method="POST">		      		    
+		    <form action="<?php echo site_url()?>/Transaksi/SimpanNotaPembelian" method="POST">		      		    
 		      	<div class="col-12" style="text-align:right;">
 		      		<div class="form-group">
-		      			<p for="pelanggan" style="text-align:left">Pelanggan :</p>
-	        			<input type="text" name="nama-pelanggan" class="form-control nama-pelanggan" placeholder="Nama Pelanggan" id="nama-pelanggan">
+		      			<p for="pelanggan" style="text-align:left">Nama Toko :</p>
+	        			<input type="text" name="nama-toko" class="form-control nama-toko" placeholder="Nama Toko" id="nama-toko">
 	        		</div>
 		      		<button type="button" class="btn btn-primary" id="tambah-item">tambah item</button>		      		
 		      	</div>
 		        <div class="col-12" id="form-nota">
-		        	<h3>Item Terpakai: </h3>
-		        	<div id="component-item-1" data-index="0">
+		        	<h3>Item Terbeli: </h3>
+		        	<div id="component-item-0" data-index="0">
 		        		<div class="col-md-12 col-sm-12 item-section">
 		        			<label for="item1">Item 1</label>
 		        			<!-- <button class="btn btn-danger delete-item" data-component="1">x</button> -->
 		        		</div>	        		
 		        		<div class="row">
-		        			<div class="col-md-4 col-sm-12 form-group">
-			        			<input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-1" data-index="0">
+		        			<div class="col form-group">
+			        			<input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-0" data-index="0">
 			        		</div>		        	
-				        	<div class="col-md-4 col-sm-12 form-group">
-				        		<input type="text" name="nama-barang[]" class="form-control" placeholder="nama barang" id="nama-barang-1" data-index="0">
+				        	<div class="col form-group">
+				        		<input type="text" name="nama-barang[]" class="form-control" placeholder="nama barang" id="nama-barang-0" data-index="0">
 				        	</div>
-				        	<div class="col-md-4 col-sm-12 form-group">
-				        		<input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-1" data-index="0" value="0">
-				        	</div>					        		        
+				        	<div class="col form-group">
+			        			<input type="text" name="jenis-barang[]" class="form-control jenis-barang" placeholder="Jenis barang" id="jenis-barang-0" data-index="0">
+			        		</div>		        	
+				        	<div class="col form-group">
+				        		<input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-0" data-index="0">
+				        	</div>					
+				        	<div class="col form-group">
+			        			<input type="number" name="harga-barang[]" class="form-control harga-barang" placeholder="Total harga" id="harga-barang-0" data-index="0">
+			        		</div>		        	        		        
 		        		</div>
 			        </div>
 		        </div>
@@ -140,7 +146,7 @@
 				        		<input type="text" name="nama-barang[]" class="form-control" placeholder="nama barang" id="view-nama-barang-0" data-index="0" disabled="true">
 				        	</div>
 				        	<div class="col-md-4 col-sm-12 form-group">
-				        		<input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="view-jumlah-barang-0" data-index="0" value="0" disabled="true">
+				        		<input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="view-jumlah-barang-0" data-index="0" disabled="true">
 				        	</div>					        		        
 		        		</div>
 			        </div> -->
@@ -163,24 +169,6 @@
 
 <script type="text/javascript">
 	$(document).ready(() =>{
-		// creating local storage
-		if (typeof(Storage) !== undefined) {
-			console.log("ada")
-			$.ajax({
-				url: "<?php echo site_url()?>/Inventory/GetInventoryJSON",
-				type: "GET",
-				ContentType: 'application/json',
-                dataType: 'json',                     
-                success: (result, status) => {
-                	result.map((item,index) => {
-                		localStorage.setItem(item.KODE_BARANG,item.JUMLAH)
-                	})
-                	console.log(localStorage)
-                }
-			})
-		} else {
-			alert("your browser doest support local storage, pls change the browser")
-		}
 
 		$('#form-nota').on('focusin', 'input, textarea', function(event) {
 		  if(navigator.userAgent.indexOf('Android') > -1 && navigator.userAgent.indexOf('iPhone')){
@@ -211,7 +199,7 @@
 				show: "tampilkan"
 			},
 			ajax: {
-				url: "<?php echo site_url()?>/Transaksi/GetBukuPengeluaran",
+				url: "<?php echo site_url()?>/Transaksi/GetBukuPembelian",
 				type: "POST",
 				dataType: "json"
 			},
@@ -221,12 +209,12 @@
 					title: "NO BUKU"
 				},
 				{
-					data: "TANGGAL_KELUAR",
-					title: "TANGGAL KELUAR"
+					data: "TANGGAL_BELI",
+					title: "TANGGAL BELI"
 				},
 				{
-					data: "PELANGGAN",
-					title: "PELANGGAN"
+					data: "TOKO_BELI",
+					title: "TOKO BELI"
 				},
 				{
 					data: "DESKRIPSI",
@@ -253,7 +241,7 @@
 	
 		let notaItem = []
 		let numberItem = 1
-		let indexItem = 0
+		let indexItem = 1
 		let tambahItem = () => {
 			numberItem = numberItem+1			
 			indexItem = indexItem+1
@@ -262,7 +250,30 @@
 				namaBarang: "",
 				jumlah:0
 			}
-			let componentItem = `<div id="component-item-${numberItem}" data-index=${indexItem}><div class="col-sm-12 col-md-12"><button class="btn btn-danger delete-item" data-component="${numberItem}">x</button><label for="item${numberItem}">Item ${numberItem}</label></div><div class="row"><div class="col-md-4 col-sm-12 form-group"><input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-${numberItem}" data-index=${indexItem}></div><div class="col-md-4 col-sm-12 form-group"><input type="text" name="nama-barang[]" class="form-control" placeholder="nama barang" id="nama-barang-${numberItem}" data-index=${indexItem}></div><div class="col-md-4 col-sm-12 form-group"><input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-${numberItem}" data-index=${indexItem} value="0"></div></div></div>`
+			let componentItem = `
+			<div id="component-item-${numberItem}" data-index="${indexItem}">
+        		<div class="col-md-12 col-sm-12 item-section">
+        			<label for="item${numberItem}">Item ${numberItem}</label>
+        			<button class="btn btn-danger delete-item" data-component="${numberItem}">x</button>
+        		</div>	        		
+        		<div class="row">
+        			<div class="col form-group">
+	        			<input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="kode-barang-${numberItem}" data-index="${indexItem}">
+	        		</div>		        	
+		        	<div class="col form-group">
+		        		<input type="text" name="nama-barang[]" class="form-control" placeholder="nama barang" id="nama-barang-${numberItem}" data-index="${indexItem}">
+		        	</div>
+		        	<div class="col form-group">
+	        			<input type="text" name="jenis-barang[]" class="form-control kode-barang" placeholder="Jenis barang" id="jenis-barang-${numberItem}" data-index="${indexItem}">
+	        		</div>		        	
+		        	<div class="col form-group">
+		        		<input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="jumlah-barang-${numberItem}" data-index="${indexItem}">
+		        	</div>					
+		        	<div class="col form-group">
+	        			<input type="number" name="harga-barang[]" class="form-control harga-barang" placeholder="Total harga" id="harga-barang-${numberItem}" data-index="${indexItem}">
+	        		</div>		        	        		        
+        		</div>
+	        </div>`
 			$("#form-nota").append(componentItem)
 		}
 
@@ -328,46 +339,13 @@
 			})
 		}		
 		$("#form-nota").on("change",'.kode-barang', (e) => {			
-			let noId = $(e.target).attr('id').split("-").pop()						
-			checkKodeBarang($(e.target).val(), noId, $(e.target).data('index'))
+			
 		})		
 
 		$("#form-nota").on("change",'.jumlah-barang', (e) => {						
-			let noId = $(e.target).attr('id').split("-").pop()
-			let kodeBarang = $(`#kode-barang-${noId}`).val()								
-			checkJumlahBarang(kodeBarang, noId, $(e.target).data("index"))
+			
 		})
 
-		let checkJumlahBarang = (kodeBarang, noId, index) => {
-			let component = `component-item-${noId}`			
-			$(`#${component}`).find(".alert-ketersediaan").remove()
-			if (notaItem[index] != undefined) {
-				let oldJumlah = parseInt(notaItem[index].jumlah)
-				let newJumlah = 0
-				if ($(`#jumlah-barang-${noId}`).val() != "") {
-					newJumlah = parseInt($(`#jumlah-barang-${noId}`).val())
-				}
-				notaItem[index].jumlah = newJumlah
-				let changeCount = newJumlah - oldJumlah
-				// console.log("old: "+oldJumlah)
-				// console.log("new: "+newJumlah)
-				// console.log("perubahan:" +changeCount)
-				let storage = parseInt(localStorage.getItem(kodeBarang))				
-				if ((storage - changeCount) < 0) {					
-					$(`#jumlah-barang-${noId}`).val(0)
-					notaItem[index].jumlah = 0															
-					storage = storage + oldJumlah
-					localStorage.setItem(kodeBarang,storage)
-					let alertKetersediaan = '<div class="alert alert-danger alert-ketersediaan" role="alert" style="margin: 5px 0;">Stock barang pada inventory tidak mencukupi, stock tersisa: '+localStorage.getItem([kodeBarang])+'</div>'
-            		$(`#${component}`).append(alertKetersediaan)
-
-				} else{					
-					storage = storage - changeCount
-					localStorage.setItem(kodeBarang,storage)
-				}
-				console.log(localStorage)
-			}			
-		}
 
 		$("#form-nota").on("click", ".delete-item", (e) => {
 			let noId = $(e.target).data("component")
@@ -379,10 +357,7 @@
 
 		let hapusItem = (noId, index) =>{
 			let kodeBarang = $(`#kode-barang-${noId}`).val()
-			let jumlahBarang = parseInt($(`#jumlah-barang-${noId}`).val())
-			let storage = parseInt(localStorage.getItem(kodeBarang))
-			storage = storage + jumlahBarang
-			localStorage.setItem(kodeBarang, storage)
+			let jumlahBarang = parseInt($(`#jumlah-barang-${noId}`).val())			
 			notaItem[index] = {}
 			// console.log(notaItem)
 			// console.log(localStorage)
@@ -394,6 +369,20 @@
 			if (e.keyCode == 13) {
 				e.preventDefault()
 				return false
+			}
+		})
+
+		$("#form-nota").on('focusin', '.jumlah-barang,.harga-barang', (e) => {
+			let val = $(e.target).val()
+			if (val == "") {
+				$(e.target).val(0)
+			}
+		})
+
+		$("#form-nota").on('focusout', '.jumlah-barang,.harga-barang', (e) => {
+			let val = $(e.target).val()
+			if (val == 0) {
+				$(e.target).val("")
 			}
 		})
 
@@ -415,8 +404,7 @@
                 dataType: 'json',                     
                 success: (result, status) => { 
                		let indexView = 0
-               		console.log(result)
-               		$("#form-view").find(".component-view").remove()
+               		console.log(result)               		
                		$("#headernota").html(noNota)
                		$("#view-pelanggan").val(result.pelanggan)
                		$("#view-deskripsi").val(result.deskripsi)               		
@@ -446,6 +434,13 @@
                		$("#modalView").modal()
                 }
 			})
+		})
+
+		$("#modalView").on("hidden.bs.modal", (e) => {
+			$("#form-view").find(".component-view").remove()
+			$("#headernota").html("")
+       		$("#view-pelanggan").val("")
+       		$("#view-deskripsi").val("")               		
 		})
 
 		$("#table-pengeluaran").on("click",".btn-delete",(e) => {

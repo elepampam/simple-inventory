@@ -1,3 +1,9 @@
+@media only screen and (max-width: 500px) {
+    .col{
+        flex-basis: auto;
+    }
+}
+
 #headbar{
 	margin: 15px 0;
 }

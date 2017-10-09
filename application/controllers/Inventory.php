@@ -83,6 +83,6 @@ class Inventory extends CI_Controller {
 			));
 		}
 		echo json_encode($response);
-	}
+	}	
 
 }

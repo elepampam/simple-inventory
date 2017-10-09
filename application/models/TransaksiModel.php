@@ -72,4 +72,92 @@ class TransaksiModel extends CI_Model {
 		}
 		return null;
 	}
+
+	public function DeleteBukuPengeluaran($noBuku){
+		$this->db->where("NO_BUKU",$noBuku);
+		$result = $this->db->delete("buku_pengeluaran");
+		return $result;
+	}
+
+	public function DeletePengeluaran($noBuku){
+		$this->db->where("NO_PENGELUARAN", $noBuku);
+		$result = $this->db->delete("pengeluaran");
+		return $result;
+	}
+
+	public function AmbilInventory($kodeBarang){
+		$this->db->select("*");
+		$this->db->from("inventory");
+		$this->db->where_in("KODE_BARANG", $kodeBarang);
+		$result = $this->db->get();
+		if ($result->num_rows() > 0) {
+			return $result->result();
+		}
+		else
+			return null;
+	}
+
+	public function insertBukuPengeluaran($nota){
+		$this->db->insert('buku_pengeluaran', $nota);
+	}
+
+	public function insertPengeluaran($item){
+		$this->db->insert_batch('pengeluaran', $item);
+	}
+
+	public function insertBukuPembelian($nota){
+		$this->db->insert('buku_pembelian', $nota);
+	}
+
+	public function insertPembelian($item){
+		$this->db->insert_batch('pembelian', $item);
+	}
+
+	public function getBukuPembelianData($limit, $start, $order, $dir){
+		$this->db->select("*");
+		$this->db->from("buku_pembelian");
+		$this->db->limit($limit, $start);
+		$this->db->order_by($order,$dir);
+		$result = $this->db->get();
+
+		if ($result->num_rows() > 0) {
+			return $result->result();
+		}
+		else
+			return null;
+	}
+
+	public function countBukuPembelian(){
+		$this->db->select("*");
+		$this->db->from("buku_pembelian");		
+		$result = $this->db->get();
+		return $result->num_rows();		
+	}
+
+	public function bukuPembelianSearch($search, $limit, $start, $order, $dir){
+		$this->db->select("*");
+		$this->db->from("buku_pembelian");
+		$this->db->like("KODE_BARANG", $search);
+		$this->db->or_like("JENIS_BARANG",$search);
+		$this->db->or_like("NAMA_BARANG", $search);	
+		$this->db->limit($limit, $start);
+		$this->db->order_by($order,$dir);
+		$result = $this->db->get();
+		if ($result->num_rows() > 0) {
+			return $result->result();
+		}
+		else
+			return null;
+	}
+
+	public function bukuPembelianSearchCount($search){
+		$this->db->select("*");
+		$this->db->from("buku_pembelian");
+		$this->db->like("KODE_BARANG", $search);
+		$this->db->or_like("JENIS_BARANG",$search);
+		$this->db->or_like("NAMA_BARANG", $search);	
+		$result = $this->db->get();
+		return $result->num_rows();
+	}
+
 }
