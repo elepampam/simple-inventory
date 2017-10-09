@@ -102,13 +102,18 @@
 				{
 					data: "HARGA_TOTAL",
 					title: "HARGA TOTAL"
+				},
+				{
+					data: "ACTION",
+					title: "ACTION"
 				}
 			],
 			initComplete: () => {
-				redrawTableComponent()
+				redrawTableComponent()				 
+				$('[data-toggle="tooltip"]').tooltip()
 				console.log("done table inventory")
 			}
-		})
+		})		
 	})
 </script>
 </html>

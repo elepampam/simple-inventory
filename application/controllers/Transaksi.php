@@ -200,8 +200,8 @@ class Transaksi extends CI_Controller {
 				$temp["PELANGGAN"] = $item->PELANGGAN;
 				$temp["DESKRIPSI"] = $item->DESKRIPSI;	
 				$temp["ACTION"] = 
-				"<button type='button' class='btn btn-primary btn-view' data-nobuku='".$item->NO_BUKU."'><span class='oi oi-eye' title='icon menu' aria-hidden='true'></span></button>
-				<a href='".site_url()."/Transaksi/DeletePengeluaran?nobuku=".$item->NO_BUKU."' class='btn btn-danger btn-delete' data-nobuku='".$item->NO_BUKU."'><span class='oi oi-trash' title='icon menu' aria-hidden='true'></span></a>";
+				"<button type='button' class='btn btn-primary btn-view' data-nobuku='".$item->NO_BUKU."' data-toggle='tooltip' data-placement='top' title='view'><span class='oi oi-eye' title='icon menu' aria-hidden='true'></span></button>
+				<a href='".site_url()."/Transaksi/DeletePengeluaran?nobuku=".$item->NO_BUKU."' class='btn btn-danger btn-delete' data-nobuku='".$item->NO_BUKU."' data-toggle='tooltip' data-placement='top' title='delete'><span class='oi oi-trash' title='icon menu' aria-hidden='true'></span></a>";
 				array_push($data, $temp);
 			}
 		}
@@ -252,8 +252,8 @@ class Transaksi extends CI_Controller {
 				$temp["TOKO_BELI"] = $item->TOKO_BELI;
 				$temp["DESKRIPSI"] = $item->DESKRIPSI;	
 				$temp["ACTION"] = 
-				"<button type='button' class='btn btn-primary btn-view' data-nobuku='".$item->NO_BUKU."'><span class='oi oi-eye' title='icon menu' aria-hidden='true'></span></button>
-				<a href='".site_url()."/Transaksi/DeletePengeluaran?nobuku=".$item->NO_BUKU."' class='btn btn-danger btn-delete' data-nobuku='".$item->NO_BUKU."'><span class='oi oi-trash' title='icon menu' aria-hidden='true'></span></a>";
+				"<button type='button' class='btn btn-primary btn-view' data-nobuku='".$item->NO_BUKU."' data-toggle='tooltip' data-placement='top' title='view'><span class='oi oi-eye' title='icon menu' aria-hidden='true'></span></button>
+				<a href='".site_url()."/Transaksi/DeletePembelian?nobuku=".$item->NO_BUKU."' class='btn btn-danger btn-delete' data-nobuku='".$item->NO_BUKU."'  data-toggle='tooltip' data-placement='top' title='delete'><span class='oi oi-trash' title='icon menu' aria-hidden='true'></span></a>";
 				array_push($data, $temp);
 			}
 		}
@@ -265,6 +265,49 @@ class Transaksi extends CI_Controller {
                 "data"            => $data   
 		);
 		echo json_encode($jsonData);
+	}
+
+	private function toRP($angka){
+		$angka = str_split($angka);
+		$fixedRp = ",00";
+		$index = 0;
+		for ($i=count($angka)-1; $i >= 0 ; $i--) { 
+			if ($index % 3 == 0 && $index != 0) {
+				$fixedRp = $angka[$i].".".$fixedRp;
+			}
+			else
+				$fixedRp = $angka[$i].$fixedRp;
+			$index++;
+		}
+		return "Rp. ".$fixedRp;
+	}
+
+	public function GetDetailPembelian(){
+		$noNota = $this->input->get("no-buku");
+		$this->load->model("TransaksiModel", "transaksimodel");
+		$items = $this->transaksimodel->GetDetailPembelian($noNota);
+		$response = array();
+		if (!empty($items)) {
+			$response["toko"] = $items[0]->TOKO_BELI;
+			$response["deskripsi"] = $items[0]->DESKRIPSI;
+			$response["items"] = array();
+			foreach ($items as $item) {				
+				array_push($response["items"], array(
+					"KODE_BARANG" => $item->KODE_BARANG,
+					"NAMA_BARANG" => $item->NAMA_BARANG,
+					"JENIS_BARANG" => $item->JENIS_BARANG,
+					"JUMLAH" => $item->JUMLAH." lembar",
+					"HARGA_BELI" => $this->toRP($item->HARGA_BELI)
+				));
+			}
+		}
+		else{
+			$response["pelanggan"] = "tidak ditemukan";
+			$response["deskripsi"] = "tidak ditemukan";
+			$response["items"] = array();
+		}
+
+		echo json_encode($response);
 	}
 
 	public function GetDetailPengeluaran(){
@@ -279,7 +322,7 @@ class Transaksi extends CI_Controller {
 			foreach ($items as $item) {
 				$temp["KODE_BARANG"] = $item->KODE_BARANG;
 				$temp["NAMA_BARANG"] = $item->NAMA_BARANG;
-				$temp["JUMLAH"] = $item->JUMLAH;
+				$temp["JUMLAH"] = $item->JUMLAH." lembar";
 				array_push($response["items"], $temp);
 			}
 		}
@@ -298,6 +341,14 @@ class Transaksi extends CI_Controller {
 		$status1 = $this->transaksimodel->DeleteBukuPengeluaran($noBuku);
 		$status2 = $this->transaksimodel->DeletePengeluaran($noBuku);
 		redirect("Transaksi/Pengeluaran");
+	}	
+
+	public function DeletePembelian(){
+		$noBuku = $this->input->get("nobuku");
+		$this->load->model("TransaksiModel","transaksimodel");
+		$status1 = $this->transaksimodel->DeleteBukuPembelian($noBuku);
+		$status2 = $this->transaksimodel->DeletePembelian($noBuku);
+		redirect("Transaksi/Pembelian");
 	}	
 
 	private function updatePembelianInventory($items){
@@ -344,7 +395,7 @@ class Transaksi extends CI_Controller {
 			for ($i=0; $i < count($kodeBarang); $i++) { 
 				$kodeBarang[$i] = strtoupper($kodeBarang[$i]);
 				$found = false;
-				foreach ($items as $item) {
+				foreach ($items as $item) {					
 					if ($kodeBarang[$i] === $item->KODE_BARANG) {
 						$item->HARGA_POKOK = round((($item->JUMLAH * $item->HARGA_POKOK) + ($harga[$i])) / ($item->JUMLAH + $jumlah[$i]));
 						$item->JUMLAH += $jumlah[$i];
@@ -366,13 +417,25 @@ class Transaksi extends CI_Controller {
 					"NO_PEMBELIAN" => $generatedIdNota,
 					"KODE_BARANG" =>$kodeBarang[$i],
 					"JUMLAH" => $jumlah[$i],
-					"HARGA_BELI" => $jumlah[$i]
+					"HARGA_BELI" => $harga[$i]
 				));				
 			}
-		}								
+		}		
+		else{
+			$items = array();
+			for ($i=0; $i < count($kodeBarang); $i++) { 
+				array_push($items, (object) array(
+					"KODE_BARANG" => $kodeBarang[$i],
+					"JENIS_BARANG" => $jenis[$i],
+					"NAMA_BARANG" => $namaBarang[$i],
+					"HARGA_POKOK" => $harga[$i],
+					"JUMLAH" => $jumlah[$i]
+				));
+			}
+		}						
 		$this->updatePembelianInventory($items);						
 		$this->transaksimodel->insertBukuPembelian($nota);
-		$this->transaksimodel->insertPembelian($pembelian);
+		$this->transaksimodel->insertPembelian($pembelian);		
 		redirect("Transaksi/Pembelian");
 	}
 }

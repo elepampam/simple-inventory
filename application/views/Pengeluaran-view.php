@@ -238,6 +238,7 @@
 			],
 			initComplete: () => {
 				redrawTableComponent()
+				$('[data-toggle="tooltip"]').tooltip()
 				console.log("done table Pengeluaran")
 			}
 		})
@@ -435,7 +436,7 @@
 					        		<input type="text" name="nama-barang[]" class="form-control" placeholder="nama barang" id="view-nama-barang-${indexView}" data-index="0" readonly="true" value="${item.NAMA_BARANG}">
 					        	</div>
 					        	<div class="col-md-4 col-sm-12 form-group">
-					        		<input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="view-jumlah-barang-${indexView}" data-index="0" readonly="true" value="${item.JUMLAH}">
+					        		<input type="text" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="view-jumlah-barang-${indexView}" data-index="0" readonly="true" value="${item.JUMLAH}">
 					        	</div>					        		        
 			        		</div>
 				        </div>`               

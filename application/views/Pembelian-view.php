@@ -122,45 +122,25 @@
 	          <span aria-hidden="true">&times;</span>
 	        </button>
 	      </div>
-	      <div class="modal-body">
-		    <form action="<?php echo site_url()?>/Transaksi/SimpanNotaPenjualan" method="POST">		      		    
-		      	<div class="col-12" style="text-align:right;">
-		      		<div class="form-group">
-		      			<p for="pelanggan" style="text-align:left">Pelanggan :</p>
-	        			<input type="text" name="nama-pelanggan" class="form-control nama-pelanggan" placeholder="Nama Pelanggan" id="view-pelanggan">
-	        		</div>
-		      		<!-- <button type="button" class="btn btn-primary" id="edit-tambah-item" disabled="true">tambah item</button>		      		 -->
-		      	</div>
-		        <div class="col-12" id="form-view">
-		        	<h3>Item Terpakai: </h3>
-		        <!-- 	<div class="component-view" id="component-view-0" data-index="0">
-		        		<div class="col-md-12 col-sm-12 item-section">
-		        			<label for="item1">Item 1</label>
-		        			<button class="btn btn-danger delete-item" data-component="0">x</button>
-		        		</div>	        		
-		        		<div class="row">
-		        			<div class="col-md-4 col-sm-12 form-group">
-			        			<input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="view-kode-barang-0" data-index="0" disabled="true">
-			        		</div>		        	
-				        	<div class="col-md-4 col-sm-12 form-group">
-				        		<input type="text" name="nama-barang[]" class="form-control" placeholder="nama barang" id="view-nama-barang-0" data-index="0" disabled="true">
-				        	</div>
-				        	<div class="col-md-4 col-sm-12 form-group">
-				        		<input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="view-jumlah-barang-0" data-index="0" disabled="true">
-				        	</div>					        		        
-		        		</div>
-			        </div> -->
-		        </div>
-		        <hr>
-	        	<div class="col-12 form-group">
-	        		<label for="deskripsi">Deskripsi :</label>
-	        		<textarea class="form-control" placeholder="deksripsi" id="view-deskripsi" name="deskripsi"></textarea>
-	        	</div>		        
+	      <div class="modal-body">		         		   
+	      	<div class="col-12" style="text-align:right;">
+	      		<div class="form-group">
+	      			<p for="pelanggan" style="text-align:left">Pelanggan :</p>
+        			<input type="text" name="nama-pelanggan" class="form-control nama-pelanggan" placeholder="Nama Pelanggan" id="view-pelanggan" readonly="true">
+        		</div>	      		
+	      	</div>
+	        <div class="col-12" id="form-view">
+	        	<h3>Item Terbeli: </h3>
+	        </div>
+	        <hr>
+        	<div class="col-12 form-group">
+        		<label for="deskripsi">Deskripsi :</label>
+        		<textarea class="form-control" placeholder="deksripsi" id="view-deskripsi" name="deskripsi" readonly="true"></textarea>
+        	</div>		        
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>	        	        
-	      </div>
-	      	</form>
+	      </div>	      	
 	    </div>
 	  </div>
 	</div>
@@ -226,12 +206,13 @@
 			],
 			initComplete: () => {
 				redrawTableComponent()
+				$('[data-toggle="tooltip"]').tooltip()
 				console.log("done table Pengeluaran")
 			}
 		})
 
 		let openModalNota = () => {
-			$("body").css("overflow", "hidden");
+			$("body").css("overflow", "hidden");			
 			$("#modalNota").modal({backdrop: "static"})
 		}
 
@@ -398,7 +379,7 @@
 		$('#table-pengeluaran').on("click",".btn-view",(e) =>{			
 			let noNota = $(e.currentTarget).data("nobuku")					
 			$.ajax({
-				url: "<?php echo site_url()?>/Transaksi/GetDetailPengeluaran?no-buku="+noNota,
+				url: "<?php echo site_url()?>/Transaksi/GetDetailPembelian?no-buku="+noNota,
 				type: "GET",
 				ContentType: 'application/json',
                 dataType: 'json',                     
@@ -406,7 +387,7 @@
                		let indexView = 0
                		console.log(result)               		
                		$("#headernota").html(noNota)
-               		$("#view-pelanggan").val(result.pelanggan)
+               		$("#view-pelanggan").val(result.toko)
                		$("#view-deskripsi").val(result.deskripsi)               		
                		let appendComponent = ""
                		result.items.map((item) => {               			
@@ -416,14 +397,20 @@
 			        			<label for="item${indexView}">Item ${indexView+1}</label>		        			
 			        		</div>	        		
 			        		<div class="row">
-			        			<div class="col-md-4 col-sm-12 form-group">
+			        			<div class="col form-group">
 				        			<input type="text" name="kode-barang[]" class="form-control kode-barang" placeholder="Kode barang" id="view-kode-barang-${indexView}" data-index="0" readonly="true" value="${item.KODE_BARANG}">
 				        		</div>		        	
-					        	<div class="col-md-4 col-sm-12 form-group">
+					        	<div class="col form-group">
 					        		<input type="text" name="nama-barang[]" class="form-control" placeholder="nama barang" id="view-nama-barang-${indexView}" data-index="0" readonly="true" value="${item.NAMA_BARANG}">
 					        	</div>
-					        	<div class="col-md-4 col-sm-12 form-group">
-					        		<input type="number" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="view-jumlah-barang-${indexView}" data-index="0" readonly="true" value="${item.JUMLAH}">
+					        	<div class="col form-group">
+				        			<input type="text" name="jenis-barang[]" class="form-control kode-barang" placeholder="Jenis barang" id="view-jenis-barang-${indexView}" data-index="0" readonly="true" value="${item.JENIS_BARANG}">
+				        		</div>	
+					        	<div class="col form-group">
+					        		<input type="text" name="jumlah-barang[]" class="form-control jumlah-barang" placeholder="jumlah barang" id="view-jumlah-barang-${indexView}" data-index="0" readonly="true" value="${item.JUMLAH}">
+					        	</div>
+					        	<div class="col form-group">
+					        		<input type="text" name="harga-barang[]" class="form-control harga-barang" placeholder="Harga total" id="view-harga-barang-${indexView}" data-index="0" readonly="true" value="${item.HARGA_BELI}">
 					        	</div>					        		        
 			        		</div>
 				        </div>`               

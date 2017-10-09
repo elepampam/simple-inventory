@@ -61,11 +61,24 @@ class TransaksiModel extends CI_Model {
 	}
 
 	public function GetDetailPengeluaran($noBuku){
-		$this->db->select("buku_pengeluaran.NO_BUKU,buku_pengeluaran.TANGGAL_KELUAR,buku_pengeluaran.PELANGGAN,buku_pengeluaran.DESKRIPSI,pengeluaran.JUMLAH,inventory.KODE_BARANG,inventory.NAMA_BARANG,");
+		$this->db->select("buku_pengeluaran.NO_BUKU,buku_pengeluaran.TANGGAL_KELUAR,buku_pengeluaran.PELANGGAN,buku_pengeluaran.DESKRIPSI,pengeluaran.JUMLAH,inventory.KODE_BARANG,inventory.NAMA_BARANG");
 		$this->db->from("buku_pengeluaran");
 		$this->db->join("pengeluaran","buku_pengeluaran.NO_BUKU = pengeluaran.NO_PENGELUARAN");
 		$this->db->join("inventory", "pengeluaran.KODE_BARANG = inventory.KODE_BARANG");
 		$this->db->where("buku_pengeluaran.NO_BUKU", $noBuku);
+		$result = $this->db->get();
+		if ($result->num_rows() > 0) {
+			return $result->result();
+		}
+		return null;
+	}
+
+	public function GetDetailPembelian($noBuku){
+		$this->db->select("buku_pembelian.NO_BUKU,buku_pembelian.TANGGAL_BELI,buku_pembelian.TOKO_BELI,buku_pembelian.DESKRIPSI,pembelian.JUMLAH,inventory.KODE_BARANG,inventory.NAMA_BARANG,inventory.JENIS_BARANG, pembelian.HARGA_BELI");
+		$this->db->from("buku_pembelian");
+		$this->db->join("pembelian","buku_pembelian.NO_BUKU = pembelian.NO_PEMBELIAN");
+		$this->db->join("inventory", "pembelian.KODE_BARANG = inventory.KODE_BARANG");
+		$this->db->where("buku_pembelian.NO_BUKU", $noBuku);
 		$result = $this->db->get();
 		if ($result->num_rows() > 0) {
 			return $result->result();
@@ -82,6 +95,18 @@ class TransaksiModel extends CI_Model {
 	public function DeletePengeluaran($noBuku){
 		$this->db->where("NO_PENGELUARAN", $noBuku);
 		$result = $this->db->delete("pengeluaran");
+		return $result;
+	}
+
+	public function DeleteBukuPembelian($noBuku){
+		$this->db->where("NO_BUKU",$noBuku);
+		$result = $this->db->delete("buku_pembelian");
+		return $result;
+	}
+
+	public function DeletePembelian($noBuku){
+		$this->db->where("NO_PEMBELIAN", $noBuku);
+		$result = $this->db->delete("pembelian");
 		return $result;
 	}
 

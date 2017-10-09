@@ -60,6 +60,9 @@ class Inventory extends CI_Controller {
 				$temp["HARGA_POKOK"] = $this->toRP($item->HARGA_POKOK);
 				$temp["JUMLAH"] = $item->JUMLAH." lembar";
 				$temp["HARGA_TOTAL"] = $this->toRP($item->HARGA_POKOK * $item->JUMLAH);
+				$temp["ACTION"] = 
+				"<a href='".site_url()."/Inventory/KosongkanBarang?kode-barang=".$item->KODE_BARANG."' class='btn btn-primary btn-view' data-kodebarang='".$item->KODE_BARANG."' data-toggle='tooltip' data-placement='top' title='kosongkan'><span class='oi oi-reload' title='icon reload' aria-hidden='true'></span></a>
+				<a href='".site_url()."/Inventory/DeleteInventory?kode-barang=".$item->KODE_BARANG."' class='btn btn-danger btn-delete' data-kodebarang='".$item->KODE_BARANG."' data-toggle='tooltip' data-placement='top' title='delete'><span class='oi oi-trash' title='icon trash' aria-hidden='true'></span></a>";
 				array_push($data, $temp);
 			}
 		}
